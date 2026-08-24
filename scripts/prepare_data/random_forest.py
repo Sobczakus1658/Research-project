@@ -59,6 +59,6 @@ def merge_and_predict_missing_users(aidev_path, github_path, output_path):
 if __name__ == "__main__":
     AIDEV_FILE = '../../data/prepare_data/data_from_aidev.csv'
     GITHUB_FILE = '../../data/prepare_data/data_from_github.csv'
-    OUTPUT_FILE = '../../data/prepare_data/final_combined_data_tmp.csv'
+    OUTPUT_FILE = '../../data/prepare_data/final_combined_data.csv'
     
     merge_and_predict_missing_users(AIDEV_FILE, GITHUB_FILE, OUTPUT_FILE)
