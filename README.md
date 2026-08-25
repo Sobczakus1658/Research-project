@@ -2,7 +2,7 @@
 
 ## 🇵🇱 Wersja polska
 
-Plik zawiera opis odtworzenia wyników oraz kolejność uruchamiania skryptów wraz z opisem przetwarzanych danych.
+Plik zawiera opis odtworzenia wyników oraz kolejność uruchamiania skryptów wraz z opisem przetwarzanych danych. Analiza wyników znajduje się w pliku: raport.pdf
 
 ### **Krok 0: Pobranie i podział danych wejściowych**
 1. Pobierz dane z bazy **AIDEV** (https://huggingface.co/datasets/hao-li/AIDev/viewer/issue).
@@ -109,7 +109,7 @@ Skrypty znajdują się w katalogu `scripts/third_experiment/`.
 ## 🇬🇧 English version
 
 This file describes how to reproduce the results, the order in which to run the scripts, and the data being processed.
-
+The analysis of the results is in the file: report.pdf
 ### **Step 0: Downloading and splitting the input data**
 1. Download the data from the **AIDEV** database (https://huggingface.co/datasets/hao-li/AIDev/viewer/issue).
 2. Extract the list of all users using the SQL query:
