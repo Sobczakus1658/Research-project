@@ -49,7 +49,7 @@ Wszystkie niezbędne skrypty znajdziesz w folderze `scripts/prepare_data`.
    python3 find_the_best_k.py
    ```
    Skrypt wczytuje `data/prepare_data/final_combined_data.csv` (surowe dane, przed PCA), stosuje
-   `QuantileTransformer` + standaryzację i liczy Gap Statistic oraz Silhouette Score dla k = 2 - 10.
+   `QuantileTransformer` + standaryzację i liczy Gap Statistic oraz Silhouette Score dla $k \in \{2, 3, \dots, 10\}$
    Wyniki (wykresy) zapisują się w `results/gap_statistic_transformed.png` oraz
    `results/silhouette_score_transformed.png`. Na tej podstawie wybierz liczbę klastrów użytą w kroku 6.
 
@@ -152,7 +152,7 @@ All the necessary scripts can be found in the `scripts/prepare_data` folder.
    python3 find_the_best_k.py
    ```
    The script loads `data/prepare_data/final_combined_data.csv` (raw data, before PCA), applies a
-   `QuantileTransformer` + standardization, and computes the Gap Statistic and Silhouette Score for k = 2–10.
+   `QuantileTransformer` + standardization, and computes the Gap Statistic and Silhouette Score for $k \in \{2, 3, \dots, 10\}$.
    The results (plots) are saved to `results/gap_statistic_transformed.png` and
    `results/silhouette_score_transformed.png`. Use these to choose the number of clusters used in Step 6.
 
