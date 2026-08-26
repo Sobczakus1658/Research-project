@@ -27,7 +27,7 @@
 \usepackage{caption}
 \usepackage{lipsum}
 \usepackage{cleveref}
-\usepackage{tabu}
+%\usepackage{tabu}
 \usepackage[newfloat]{minted}
 \setminted[R]{breaklines=true,fontsize=\footnotesize,obeytabs=true,tabsize=0}
 \setmintedinline[R]{breaklines=true,fontsize=\footnotesize}
@@ -69,14 +69,14 @@
 \begin{abstract}[en]
 With the emergence of AI agents such as Claude Code and GitHub Copilot, the software development process has evolved toward collaboration with autonomous assistants. This paper analyzes the relationship between a developer's level of experience and the way available agents are used. The study uses the \textbf{AIDev} dataset, released as part of the \textbf{MSR 2026 Mining Challenge}. The data cover the activity of over 72,000 users across more than 116,000 public repositories from December 2024 to August 2025, during which they collectively created 932,791 \textit{pull requests}. To classify developers, both the data from the above dataset and information obtained via the \textbf{GitHub GraphQL API} were used.
 Users were divided into three groups: \textbf{Junior}, \textbf{Mid}, and \textbf{Senior}, within which an attempt was made to answer the following research questions:
-
+%
 \begin{itemize}
     \item How does a developer's experience correlate with the frequency of using AI agents?
     \item Does human experience translate into a higher acceptance rate of agent-generated code?
     \item Do changes introduced by the junior group using AI require more corrections (measured by the number of comments) from the project maintainer?
 \end{itemize}
-
-
+%
+%
 \textbf{Context}: 
 %\lipsum[66]\\
 Why is this research important?\\
@@ -284,9 +284,6 @@ Code generated or supported by AI in the case of Juniors produced the lowest ave
     \label{fig:boxplot-exp3}
 \end{figure}
 
-\begin{acks}
 This work was created as part of the 2025/2026 research project under the supervision of prof. Krzysztof Stencel.
-\end{acks}
-
 \end{document}
 \endinput
