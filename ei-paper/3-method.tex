@@ -1,88 +1,124 @@
-\section{Methodology\label{sec:method}}
-For each user, I determined a set of parameters describing their activity in the GitHub repository
-\begin{itemize}
-    \item The number of projects the user was involved in as a contributor.
-    \item The number of \textit{commits} made in public repositories over the last 5 years.
-    \item The number of \textit{commits} made in private repositories over the last 5 years.
-    \item The number of \textit{code reviews} performed over the last 5 years.
-    \item The number of the user's own repositories created over the last 5 years.
-    \item The number of \textit{followers}.
-    \item The maximum number of \textit{stars} earned by a single, own repository.
-    \item The maximum number of \textit{forks} of a single, own repository.
-    \item The account tenure on the GitHub platform (time since registration).
-    \item The number of \textit{pull requests} created, recorded in the \textbf{AIDev} dataset.
-    \item The total number of commits recorded in the \textbf{AIDev} dataset.
-    \item The number of code reviews performed, based on data from the \textbf{AIDev} dataset.
-    \item The number of reported \textit{issues} originating from the \textbf{AIDev} dataset.
-\end{itemize}
+\section{Methodology}\label{sec:method}
 
-\subsection{Preliminary approach}
-The initial classification approach was based on an independent analysis of each parameter using a simple scoring system. For each of the studied features, the median and the 90th percentile were determined, which served as reference points in the scoring process. Then a function was applied assigning scores on a scale from 0 to 4 points, given by the following formula:
+We conducted an observational repository-mining study. The workflow comprised four stages: selecting the AIDev challenge snapshot, enriching developer profiles with GitHub activity data, deriving activity-based experience profiles, and comparing agent use and pull-request outcomes across the resulting groups. The developer is the unit of analysis in all three research questions; for RQ3, pull-request-level comments are first aggregated within developers to avoid treating multiple contributions by the same person as independent observations.
 
-\[
-f(x) = \min(4, \max(0, y(P_{50}) + \frac{y(P_{90}) - y(P_{50})}{P_{90} - P_{50}}(x - P_{50})))
-\] 
-where P denotes the percentile function (i.e. $P_{50}$ is the median), and $y(P_{50}) = 1$ and $y(P_{90}) = 3$.
-The final score for a user was a linear combination of the points obtained across all considered categories. Based on this calculated total value, I made the final division of users into three experience groups: Junior, Mid, and Senior.
+\subsection{Data sources and sample construction}
 
-\begin{figure}[H]
+We used the AIDev snapshot released for the MSR 2026 Mining Challenge \cite{li2026aidev}. The full-scope part of the snapshot contains 932,791 Agentic-PRs produced by five coding agents in 116,211 public GitHub repositories up to 1 August 2025 and links them to 72,189 developers. It provides pull-request metadata, repository information, and developer identifiers. Richer interaction data are available only for AIDev-pop, a curated subset of 33,596 Agentic-PRs from 2,807 repositories with more than 100 stars. In particular, issue-thread comments, formal reviews, inline review comments, commits, and related issues are limited to this subset. We therefore use the full-scope data for RQ1 and RQ2 and AIDev-pop for RQ3.
+
+% AUTHOR ACTION: identify the exact AIDev release/tag used in the analysis and
+% record it together with the dataset DOI in the replication package.
+
+The activity visible in AIDev primarily describes developers in relation to agent-associated contributions. To obtain a broader activity profile, we enriched the developer records through the GitHub GraphQL API. Table~\ref{tab:profile-indicators} lists the 13 quantitative indicators used for clustering. The five-year indicators cover the five years preceding data collection. GitHub's restricted-contribution count was used as an indicator of private activity; because GitHub exposes only an aggregate selected by the account owner, this variable must not be interpreted as the exact number of private commits.
+
+\begin{table}[tb]
     \centering
-    \includegraphics[width=1 \linewidth]{distribution_plot_clean.png}
-    \caption*{Linear percentile-based scoring model}
-    \label{fig:distribution-plot}
-\end{figure}
-However, this method showed significant methodological flaws. First of all, it treated each parameter as completely independent, ignoring existing correlations. Moreover, this model was characterized by high arbitrariness - the percentile thresholds and the final division into three groups were based on subjectively chosen values, which made reliable statistical verification impossible.
+    \caption{Indicators used to derive developer activity profiles.}
+    \label{tab:profile-indicators}
+    \small
+    \begin{tabularx}{\linewidth}{@{}p{0.31\linewidth}X@{}}
+        \toprule
+        \textbf{Indicator} & \textbf{Operationalization} \\
+        \midrule
+        Collaboration breadth & Number of repositories to which the developer contributed. \\
+        Public commits & Public commit contributions during the preceding five years. \\
+        Restricted activity & Restricted contributions during the preceding five years, when exposed by GitHub. \\
+        Pull requests opened & Pull requests opened during the preceding five years. \\
+        Reviews submitted & Pull-request reviews submitted during the preceding five years. \\
+        Account tenure & Time elapsed since creation of the GitHub account. \\
+        Followers & Number of followers at the time of data collection. \\
+        Maximum stars & Largest stargazer count among repositories owned by the developer. \\
+        Maximum forks & Largest fork count among repositories owned by the developer. \\
+        Human pull requests & Number of human-authored pull requests associated with the developer in the study data. \\
+        Commits & Number of commits associated with the developer in the study data. \\
+        Reviews & Number of reviews associated with the developer in the study data. \\
+        Issues & Number of issues associated with the developer in the study data. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
 
-\subsection{Target approach}
-In the final stage of the analysis, an unsupervised statistical approach was applied in the form of the \textit{k-means} algorithm. The analyzed dataset consists exclusively of quantitative variables characterized by a significant spread of values (e.g. the number of public repositories ranges from 1 to 617,754). To mitigate this effect and ensure an equal influence of all variables on the clustering process, the data was subjected to a quantile transformation, bringing the distributions of the variables closer to normal, and standardization of features according to the formula:
+% AUTHOR ACTION: verify the indicator names against the analysis code. The
+% original prose mentions repositories created during five years, whereas the
+% PCA output labels the corresponding variable as 5yr_prs_opened. The table
+% follows the variable name visible in the PCA output.
+% AUTHOR ACTION: record the GraphQL collection dates, exact query, pagination
+% procedure, software used, and treatment of deleted, renamed, and unavailable
+% accounts in the replication package.
 
-\[
-z = \frac{x - \mu}{\sigma}
-\]
-where $\mu$ denotes the arithmetic mean, and $\sigma$ the standard deviation of a given feature.
+The GraphQL collection yielded activity records for 70,486 of the 72,189 developers (97.64\%). Numeric indicators for the remaining 1,703 developers were estimated using random-forest regression models \cite{breiman2001random}. The models were evaluated with an 80/20 train--test split, and predicted count values were rounded to integers. Their predictive performance was limited: the observed $R^2$ values were generally between 0.05 and 0.15 and were negative for some indicators. The imputed values should therefore be regarded as approximate coverage of missing profiles rather than reliable reconstructions of their activity.
 
-In order to increase the stability and reliability of the results, outlier observations were removed from the dataset. For this, the \textbf{Isolation Forest} algorithm was used - an efficient algorithm for detecting anomalies, with the contamination parameter set at $1\%$. Then, in order to reduce noise and allow for a clear visualization of the multidimensional spaces, principal component analysis (\textbf{PCA}) was applied. Reducing the dimensionality to two principal components allowed for the preservation of key data structures while discarding $5\%$ of the variance, treated as informational noise. The data prepared in this way served as input to the \textit{k-means} algorithm.
+% AUTHOR ACTION: report the predictor set, one-model-versus-multiple-model
+% design, hyperparameters, random seed, and error measures for every imputed
+% indicator. Add a complete-case sensitivity analysis excluding the 1,703
+% imputed developers.
 
-\begin{figure}[H]
+\subsection{Preprocessing and activity-profile construction}
+
+The indicators were strongly right-skewed and differed by several orders of magnitude. We first applied a quantile transformation toward a normal marginal distribution and then standardized every feature to zero mean and unit variance. We next used Isolation Forest with the contamination parameter set to 1\% to remove the most anomalous profiles \cite{liu2008isolation}. This procedure removed 722 developers and left 71,467 profiles for the primary analysis.
+
+Principal component analysis (PCA) was applied to the transformed indicators to account for their correlations and obtain a lower-dimensional representation \cite{jolliffe2016principal}. The first two principal components retained approximately 95\% of the variance and served as input to the clustering algorithm. As shown in Figure~\ref{fig:pca-loadings}, the first component loaded positively on the activity indicators and was interpreted as a general-activity axis. The second component primarily contrasted repository visibility, represented by stars and forks, with direct contribution and review activity.
+
+\begin{figure}[tb]
     \centering
-    \includegraphics[width=1\linewidth]{pca_1.png}
-    \caption{PCA PC1}
-    \label{fig:pca-pc1}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{pca_2.png}
-    \caption{PCA PC2}
-    \label{fig:pca-pc2}
-\end{figure}
-\subsection{How to properly choose the parameter k?}
-To select the optimal number of clusters, I used two methods:
-\begin{itemize}
-    \item \textbf{Gap Statistic}: A clustering quality assessment method that compares the total within-cluster variance of the real data with the expected variance for reference data generated from a uniform distribution.
-    
-    \item \textbf{Silhouette Method}: Measures how well each point fits into its cluster compared to neighboring clusters. This score oscillates between $1$ and $-1$, where higher values indicate better separated and denser clusters.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{silnouette.png}
-    \caption*{Silhouette Method}
-    \label{fig:silhouette}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{gap_statistic.png}
-    \caption*{Gap statistic}
-    \label{fig:gap-statistic}
+    \includegraphics[width=0.92\linewidth]{pca_1.png}
+    \vspace{0.5em}
+    \includegraphics[width=0.92\linewidth]{pca_2.png}
+    \caption{Loadings of the activity indicators on the two retained principal components. PC1 primarily represents general GitHub activity, whereas PC2 contrasts repository visibility with direct contribution and review activity.}
+    \label{fig:pca-loadings}
 \end{figure}
 
-Ultimately, I chose the value $k=3$. At $k=4$, a noticeable decrease in the quality of the split is observed, and choosing a low value of the parameter prevents excessive fragmentation of the data and the creation of subgroups that are difficult to interpret. Additionally, in the business world this is the most common division, namely into: Juniors, Mids, and Seniors.
+The two-component representation was partitioned using $k$-means clustering \cite{lloyd1982least}. We examined candidate solutions for $k=2,\ldots,10$ using average silhouette width \cite{rousseeuw1987silhouettes} and the gap statistic \cite{tibshirani2001gap}. Figure~\ref{fig:cluster-diagnostics} shows that neither diagnostic identifies $k=3$ as a unique numerical optimum: the largest observed silhouette value occurs at $k=9$, while the gap statistic continues to increase toward the upper end of the evaluated range. We nevertheless retained $k=3$ as a deliberately coarse and interpretable operationalization suited to comparisons among low-, intermediate-, and high-activity profiles. Thus, the analysis is conditional on this design choice and does not claim that three clusters constitute the intrinsic structure of the developer population.
 
-It is worth noting that the \textit{k-means} algorithm performs clustering in an unsupervised manner - it determines clusters but does not assign them specific labels. In order to give the groups meaning and assign them appropriate names, principal component analysis was used. It allowed for identifying the attributes with the greatest influence on the differentiation of the data. On this basis, the profiles of the individual clusters were interpreted:
+\begin{figure}[tb]
+    \centering
+    \includegraphics[width=0.90\linewidth]{silnouette.png}
+    \vspace{0.5em}
+    \includegraphics[width=0.90\linewidth]{gap_statistic.png}
+    \caption{Silhouette and gap-statistic diagnostics for candidate values of $k$. The diagnostics do not establish three clusters as the numerical optimum; $k=3$ is retained as an interpretability-constrained design choice.}
+    \label{fig:cluster-diagnostics}
+\end{figure}
 
-\begin{itemize}
-    \item \textbf{Juniors}: a group of users who achieved zero or minimal scores in the key variables.
-    
-    \item \textbf{Seniors}: a group comprising people with the highest values in the most important parameters.
-    \item \textbf{Mid}: an intermediate group, characterized by moderate scores in the analyzed metrics. 
-\end{itemize}
+The clusters were ordered by their positions on the general-activity component and by the corresponding values of the original indicators. For readability, we refer to the low-, intermediate-, and high-activity profiles as \emph{Junior}, \emph{Mid}, and \emph{Senior}, respectively. They contain 53,327, 16,192, and 1,948 developers. These names denote relative GitHub activity profiles within the analyzed population; they are not verified job titles, career stages, or direct measurements of programming competence.
+
+% AUTHOR ACTION: report all preprocessing and clustering parameters, including
+% the quantile-transform settings, PCA solver, k-means initialization, n_init,
+% convergence tolerance, software versions, and random seeds. Add sensitivity
+% analyses for alternative values of k, repeated initializations, retention of
+% outliers, and exclusion of the AIDev-derived activity indicators.
+
+\subsection{Outcome measures}
+
+The three outcome variables were not included among the clustering inputs.
+
+\paragraph{RQ1: AI-agent use intensity.}
+For each developer, we counted the number of Agentic-PRs associated with that developer in the full AIDev snapshot. This variable measures observed contribution volume during the dataset window. It does not measure the proportion of the developer's total work performed with an agent or the general probability that the developer adopts AI tools.
+
+\paragraph{RQ2: pull-request acceptance.}
+For each developer, we calculated the proportion of resolved Agentic-PRs that were merged. A pull request was classified as merged when its \texttt{merged\_at} field was non-null and as rejected when it was closed without being merged. Open pull requests were excluded from the denominator rather than treated as rejected. Developers without a resolved Agentic-PR were excluded from this analysis. This outcome concerns acceptance of pull requests, not correctness of individual generated lines or overall code quality.
+
+% AUTHOR ACTION: verify that the existing analysis code uses merged_at and
+% excludes open pull requests exactly as stated here; otherwise rerun RQ2.
+
+\paragraph{RQ3: review-discussion volume.}
+Detailed discussion artifacts are not available in the full-scope tables, so this analysis is restricted to AIDev-pop. We use the \texttt{pr\_comments} table, which contains issue-thread comments associated with pull requests. Formal review records and inline review comments are not included in the primary measure. When a bot-authored pull request is linked to an issue, the issue creator is used as the human developer associated with the contribution, following the mapping rule used in the original analysis. Pull requests that cannot be mapped to one of the activity profiles are excluded.
+
+For each retained Agentic-PR, we count non-bot comments written by an account other than the mapped developer; pull requests without a matching comment record receive a count of zero. The public AIDev fields do not provide a reproducible maintainer-role indicator for these commenters. We therefore interpret the outcome as \emph{external human discussion}, not as comments verified to have been written by maintainers. We aggregate the pull-request counts within each developer by computing the mean number of external comments per Agentic-PR. This avoids treating multiple contributions by the same developer as independent observations. The resulting measure is a proxy for visible discussion volume, not a direct count of requested corrections, review effort, defects, or code quality.
+
+% AUTHOR ACTION: RQ3 must be recomputed on AIDev-pop under the definition above.
+% The currently reported sample of 830,783 pull requests cannot be obtained from
+% the public AIDev comment tables. If a separate full-scope GitHub crawl was
+% performed, replace this subsection with its endpoints, dates, coverage,
+% joins, bot filtering, and reproducible criterion for maintainer status.
+% As a sensitivity analysis, consider adding non-empty top-level review bodies
+% from pr_reviews and inline comments from pr_review_comments_v2.
+
+\subsection{Statistical analysis}
+
+The outcome distributions were strongly non-normal, and the count-based measures contained many ties and zeros. For each research question, we first use the Kruskal--Wallis test to assess whether the outcome distributions differ across the three activity profiles. A significant omnibus result is followed by two-sided pairwise Mann--Whitney $U$ tests. The three pairwise comparisons within each research question are adjusted using the Bonferroni correction, with a family-wise significance level of $\alpha=0.05$.
+
+For every group, we report the sample size, mean, standard deviation, and median. Because the large samples make very small differences statistically detectable, we accompany $p$-values with effect sizes: epsilon-squared for the Kruskal--Wallis test and rank-biserial correlation for pairwise comparisons. All analyses concern associations between activity-based profiles and observed outcomes; the observational design does not support causal claims about the effect of professional experience.
+
+% AUTHOR ACTION: add exact post-filtering sample sizes for every RQ and report
+% the H and U statistics, adjusted p-values, effect sizes, and preferably
+% confidence intervals in Results. Check the robustness of conclusions on the
+% complete-case sample and under alternative profile constructions.
