@@ -46,9 +46,9 @@
 % Uncomment to include a bibliography of primary studies
 % \nociteS{*}
 
-\title{Research project - Who adopts Coding Agents on GitHub}
+\title{Developer Experience and AI-Agent Contributions: A Large-Scale Study of Usage, Acceptance, and Review Discussion}
 
-\shortauthorshead{Surname1 et al.}
+\shortauthorshead{Michał Sobczak}
 
 \eIsubmitted{1 Dec. 2025} 
 \eIrevised{10 Dec. 2025} 
@@ -106,7 +106,7 @@ In recent years, the development of artificial intelligence has significantly tr
 The main goal of this paper is to investigate the correlation between a developer's level of experience and the way AI tools are used. The analysis attempts to verify whether developers at an early stage of their career path turn to AI agent support more often than experts, and how the acceptance rate of changes within \textit{pull requests} varies depending on the user's level of advancement and the presence of an AI assistant. Additionally, the study examines whether experienced developers can accurately describe a task to an agent so that the generated code requires fewer subsequent corrections.
 
 \subsection*{Dataset}
-The research is based on the \textbf{AIDev} data set, which is currently the largest and most up-to-date publicly available data set of this type. A key advantage of this data set is that it concerns commercial projects, which significantly increases the reliability of the results in the context of the real job market.
+The research is based on the \textbf{AIDev} \cite{li2025aidev} data set, which is currently the largest and most up-to-date publicly available data set of this type. A key advantage of this data set is that it concerns commercial projects, which significantly increases the reliability of the results in the context of the real job market.
 
 During the initial analysis, I noticed that dividing users into the Junior, Mid, and Senior groups based solely on the data set would not be reliable. Inferring a developer's level of experience solely from their interactions with AI agents could lead to erroneous results. Moreover, the number of \textit{pull requests} created in this dataset exclusively by users is relatively small (6,618 rows compared to the overall total of 932,791 records), which would make a reliable comparison impossible. Therefore, in order to obtain a fuller picture of the studied individuals, I decided to acquire additional external information.
 
@@ -285,5 +285,10 @@ Code generated or supported by AI in the case of Juniors produced the lowest ave
 \end{figure}
 
 This work was created as part of the 2025/2026 research project under the supervision of prof. Krzysztof Stencel.
+
+\setbiblabelwidth{1000}
+\bibliographystyle{IEEEtran_for_EI} 
+\bibliography{bib}
+
 \end{document}
 \endinput
