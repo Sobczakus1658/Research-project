@@ -1,0 +1,20 @@
+
+\section{Introduction}
+\subsection*{The evolution of AI tools in programming}
+In recent years, the development of artificial intelligence has significantly transformed the software development process. Initially, AI's role was limited to simple browser-based assistants, before evolving toward integration with IDEs in the form of code autocompletion systems. Today we are witnessing another breakthrough: Agents such as \textbf{Claude Code} are gaining access to entire repositories, allowing them not only to fix bugs but also to independently implement new features.
+
+\subsection*{Research objectives}
+The main goal of this paper is to investigate the correlation between a developer's level of experience and the way AI tools are used. The analysis attempts to verify whether developers at an early stage of their career path turn to AI agent support more often than experts, and how the acceptance rate of changes within \textit{pull requests} varies depending on the user's level of advancement and the presence of an AI assistant. Additionally, the study examines whether experienced developers can accurately describe a task to an agent so that the generated code requires fewer subsequent corrections.
+
+\subsection*{Dataset}
+The research is based on the \textbf{AIDev} \cite{li2025aidev} data set, which is currently the largest and most up-to-date publicly available data set of this type. A key advantage of this data set is that it concerns commercial projects, which significantly increases the reliability of the results in the context of the real job market.
+
+During the initial analysis, I noticed that dividing users into the Junior, Mid, and Senior groups based solely on the data set would not be reliable. Inferring a developer's level of experience solely from their interactions with AI agents could lead to erroneous results. Moreover, the number of \textit{pull requests} created in this dataset exclusively by users is relatively small (6,618 rows compared to the overall total of 932,791 records), which would make a reliable comparison impossible. Therefore, in order to obtain a fuller picture of the studied individuals, I decided to acquire additional external information.
+
+\subsection*{GitHub GraphQL API}
+In order to enrich the user profiles, I decided to obtain additional metrics directly from the GitHub platform.
+Manually checking so many profiles through a browser would be time-consuming, so I decided to use the GitHub API. Initially I tested the standard REST API, but it quickly turned out that it did not allow extracting sufficiently detailed information, and an additional obstacle was the restrictive hourly request limits. After several experiments, I abandoned this approach in favor of the GitHub GraphQL API. Thanks to lower limits and broader access to data, I was able to efficiently obtain the most important information about the studied group.
+
+For each user, I obtained detailed data including the number of repositories they participated in, and the number of public and private \textit{commits} over the last five years. Additionally, I included statistics on open \textit{pull requests} and reported \textit{issues}. Ultimately, I managed to gather data for 70,486 people out of the entire group of 72,189. Based on this data, I trained a random forest based on decision trees to predict the missing statistics. For this, I used the \textbf{Random Forest Regressor} model, which predicts continuous values for missing users. Numbers of \textit{commits} or \textit{reviews} performed are integers - the result is rounded to whole numbers.
+
+It is worth noting that model validation (an 80/20 split) revealed limited predictive power of the AIDev dataset's features with respect to a user's overall GitHub activity ($R^2$ in the range of 0.05–0.15, and in some cases negative), suggesting that both data sources describe partially different aspects of activity, and the values imputed for missing users should be treated with some caution.

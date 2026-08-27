@@ -1,0 +1,88 @@
+\section{Methodology}
+For each user, I determined a set of parameters describing their activity in the GitHub repository
+\begin{itemize}
+    \item The number of projects the user was involved in as a contributor.
+    \item The number of \textit{commits} made in public repositories over the last 5 years.
+    \item The number of \textit{commits} made in private repositories over the last 5 years.
+    \item The number of \textit{code reviews} performed over the last 5 years.
+    \item The number of the user's own repositories created over the last 5 years.
+    \item The number of \textit{followers}.
+    \item The maximum number of \textit{stars} earned by a single, own repository.
+    \item The maximum number of \textit{forks} of a single, own repository.
+    \item The account tenure on the GitHub platform (time since registration).
+    \item The number of \textit{pull requests} created, recorded in the \textbf{AIDev} dataset.
+    \item The total number of commits recorded in the \textbf{AIDev} dataset.
+    \item The number of code reviews performed, based on data from the \textbf{AIDev} dataset.
+    \item The number of reported \textit{issues} originating from the \textbf{AIDev} dataset.
+\end{itemize}
+
+\subsection{Preliminary approach}
+The initial classification approach was based on an independent analysis of each parameter using a simple scoring system. For each of the studied features, the median and the 90th percentile were determined, which served as reference points in the scoring process. Then a function was applied assigning scores on a scale from 0 to 4 points, given by the following formula:
+
+\[
+f(x) = \min(4, \max(0, y(P_{50}) + \frac{y(P_{90}) - y(P_{50})}{P_{90} - P_{50}}(x - P_{50})))
+\] 
+where P denotes the percentile function (i.e. $P_{50}$ is the median), and $y(P_{50}) = 1$ and $y(P_{90}) = 3$.
+The final score for a user was a linear combination of the points obtained across all considered categories. Based on this calculated total value, I made the final division of users into three experience groups: Junior, Mid, and Senior.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1 \linewidth]{distribution_plot_clean.png}
+    \caption*{Linear percentile-based scoring model}
+    \label{fig:distribution-plot}
+\end{figure}
+However, this method showed significant methodological flaws. First of all, it treated each parameter as completely independent, ignoring existing correlations. Moreover, this model was characterized by high arbitrariness - the percentile thresholds and the final division into three groups were based on subjectively chosen values, which made reliable statistical verification impossible.
+
+\subsection{Target approach}
+In the final stage of the analysis, an unsupervised statistical approach was applied in the form of the \textit{k-means} algorithm. The analyzed dataset consists exclusively of quantitative variables characterized by a significant spread of values (e.g. the number of public repositories ranges from 1 to 617,754). To mitigate this effect and ensure an equal influence of all variables on the clustering process, the data was subjected to a quantile transformation, bringing the distributions of the variables closer to normal, and standardization of features according to the formula:
+
+\[
+z = \frac{x - \mu}{\sigma}
+\]
+where $\mu$ denotes the arithmetic mean, and $\sigma$ the standard deviation of a given feature.
+
+In order to increase the stability and reliability of the results, outlier observations were removed from the dataset. For this, the \textbf{Isolation Forest} algorithm was used - an efficient algorithm for detecting anomalies, with the contamination parameter set at $1\%$. Then, in order to reduce noise and allow for a clear visualization of the multidimensional spaces, principal component analysis (\textbf{PCA}) was applied. Reducing the dimensionality to two principal components allowed for the preservation of key data structures while discarding $5\%$ of the variance, treated as informational noise. The data prepared in this way served as input to the \textit{k-means} algorithm.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{pca_1.png}
+    \caption{PCA PC1}
+    \label{fig:pca-pc1}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{pca_2.png}
+    \caption{PCA PC2}
+    \label{fig:pca-pc2}
+\end{figure}
+\subsection{How to properly choose the parameter k?}
+To select the optimal number of clusters, I used two methods:
+\begin{itemize}
+    \item \textbf{Gap Statistic}: A clustering quality assessment method that compares the total within-cluster variance of the real data with the expected variance for reference data generated from a uniform distribution.
+    
+    \item \textbf{Silhouette Method}: Measures how well each point fits into its cluster compared to neighboring clusters. This score oscillates between $1$ and $-1$, where higher values indicate better separated and denser clusters.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{silnouette.png}
+    \caption*{Silhouette Method}
+    \label{fig:silhouette}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{gap_statistic.png}
+    \caption*{Gap statistic}
+    \label{fig:gap-statistic}
+\end{figure}
+
+Ultimately, I chose the value $k=3$. At $k=4$, a noticeable decrease in the quality of the split is observed, and choosing a low value of the parameter prevents excessive fragmentation of the data and the creation of subgroups that are difficult to interpret. Additionally, in the business world this is the most common division, namely into: Juniors, Mids, and Seniors.
+
+It is worth noting that the \textit{k-means} algorithm performs clustering in an unsupervised manner - it determines clusters but does not assign them specific labels. In order to give the groups meaning and assign them appropriate names, principal component analysis was used. It allowed for identifying the attributes with the greatest influence on the differentiation of the data. On this basis, the profiles of the individual clusters were interpreted:
+
+\begin{itemize}
+    \item \textbf{Juniors}: a group of users who achieved zero or minimal scores in the key variables.
+    
+    \item \textbf{Seniors}: a group comprising people with the highest values in the most important parameters.
+    \item \textbf{Mid}: an intermediate group, characterized by moderate scores in the analyzed metrics. 
+\end{itemize}

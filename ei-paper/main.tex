@@ -67,224 +67,30 @@
 \keywordset{test-driven development, software quality, ...} 
 
 \begin{abstract}[en]
-With the emergence of AI agents such as Claude Code and GitHub Copilot, the software development process has evolved toward collaboration with autonomous assistants. This paper analyzes the relationship between a developer's level of experience and the way available agents are used. The study uses the \textbf{AIDev} dataset, released as part of the \textbf{MSR 2026 Mining Challenge}. The data cover the activity of over 72,000 users across more than 116,000 public repositories from December 2024 to August 2025, during which they collectively created 932,791 \textit{pull requests}. To classify developers, both the data from the above dataset and information obtained via the \textbf{GitHub GraphQL API} were used.
-Users were divided into three groups: \textbf{Junior}, \textbf{Mid}, and \textbf{Senior}, within which an attempt was made to answer the following research questions:
-%
-\begin{itemize}
-    \item How does a developer's experience correlate with the frequency of using AI agents?
-    \item Does human experience translate into a higher acceptance rate of agent-generated code?
-    \item Do changes introduced by the junior group using AI require more corrections (measured by the number of comments) from the project maintainer?
-\end{itemize}
-%
-%
-\textbf{Context}: 
-%\lipsum[66]\\
-Why is this research important?\\
-Give a brief explanation of the motivation for conducting the study.\\
-\textbf{Objective}: 
-What is the question addressed in this research?\\
-Describe the aim of the study, including, e.g., the object under examination, the focus, and the perspective\\
-\textbf{Method}: 
-What are the research methods applied?\\
-Briefly characterize the research method and procedure, and also provide quantitative information, e.g., the sample size, dataset characteristics, etc.  
-E.g., We conducted a controlled experiment with 80 practitioners...\\
-\textbf{Results}: 
-What are the main results in the context of the study objective? \\
-E.g., Method 2 was significantly more effective than Method 1 with a large non-parametric effect size measure $\hat{p}$, the mean number of defects found by participants using Method 2 was 33 while...\\
-\textbf{Conclusions}: 
-What are the main findings of the study and their implications (both for practitioners and researchers)?\\
-The result reinforced existing evidence regarding the superiority of Method 2 over Method 1...
+\textbf{Context}:
+AI coding agents are increasingly used in public repositories, yet their adoption and outcomes across developer experience levels remain unclear.
+\\
+\textbf{Objective}:
+We examine associations between developer experience and agent-use frequency, acceptance of agent-associated pull requests, and maintainer review discussion.
+\\
+\textbf{Method}:
+We analyzed the AIDev dataset from the MSR 2026 Mining Challenge: $932,791$ pull requests created by $72,189$ users in more than $116,000$ public repositories between December 2024 and August 2025. The data were enriched with GitHub GraphQL activity metrics. After preprocessing and 1\% outlier removal, PCA and (k)-means (($k=3$)) grouped $71,467$ developers into activity-based Junior, Mid, and Senior clusters. Differences were tested with Kruskal--Wallis and Bonferroni-corrected Mann--Whitney (U) tests.
+\\
+\textbf{Results}:
+Developers in the Junior cluster used agents significantly less often than those in the Mid and Senior clusters; the latter two did not differ significantly. The Mid cluster had the highest mean acceptance rate (71.55\%, versus 63.33\% for Junior and 67.44\% for Senior), but only the Junior--Mid contrast was significant. Maintainer-comment counts differed significantly between all groups, with Junior receiving the fewest and Mid the most comments, although every group had a median of zero.
+\\
+\textbf{Conclusions}:
+Agent use and contribution outcomes did not follow a simple experience gradient. Comment counts may reflect discussion or task complexity rather than corrections, and the activity-based clusters should not be equated with verified professional seniority.
 \end{abstract}
 
 \maketitle 
 
-\section{Introduction}
-\subsection*{The evolution of AI tools in programming}
-In recent years, the development of artificial intelligence has significantly transformed the software development process. Initially, AI's role was limited to simple browser-based assistants, before evolving toward integration with IDEs in the form of code autocompletion systems. Today we are witnessing another breakthrough: Agents such as \textbf{Claude Code} are gaining access to entire repositories, allowing them not only to fix bugs but also to independently implement new features.
-
-\subsection*{Research objectives}
-The main goal of this paper is to investigate the correlation between a developer's level of experience and the way AI tools are used. The analysis attempts to verify whether developers at an early stage of their career path turn to AI agent support more often than experts, and how the acceptance rate of changes within \textit{pull requests} varies depending on the user's level of advancement and the presence of an AI assistant. Additionally, the study examines whether experienced developers can accurately describe a task to an agent so that the generated code requires fewer subsequent corrections.
-
-\subsection*{Dataset}
-The research is based on the \textbf{AIDev} \cite{li2025aidev} data set, which is currently the largest and most up-to-date publicly available data set of this type. A key advantage of this data set is that it concerns commercial projects, which significantly increases the reliability of the results in the context of the real job market.
-
-During the initial analysis, I noticed that dividing users into the Junior, Mid, and Senior groups based solely on the data set would not be reliable. Inferring a developer's level of experience solely from their interactions with AI agents could lead to erroneous results. Moreover, the number of \textit{pull requests} created in this dataset exclusively by users is relatively small (6,618 rows compared to the overall total of 932,791 records), which would make a reliable comparison impossible. Therefore, in order to obtain a fuller picture of the studied individuals, I decided to acquire additional external information.
-
-\subsection*{GitHub GraphQL API}
-In order to enrich the user profiles, I decided to obtain additional metrics directly from the GitHub platform.
-Manually checking so many profiles through a browser would be time-consuming, so I decided to use the GitHub API. Initially I tested the standard REST API, but it quickly turned out that it did not allow extracting sufficiently detailed information, and an additional obstacle was the restrictive hourly request limits. After several experiments, I abandoned this approach in favor of the GitHub GraphQL API. Thanks to lower limits and broader access to data, I was able to efficiently obtain the most important information about the studied group.
-
-For each user, I obtained detailed data including the number of repositories they participated in, and the number of public and private \textit{commits} over the last five years. Additionally, I included statistics on open \textit{pull requests} and reported \textit{issues}. Ultimately, I managed to gather data for 70,486 people out of the entire group of 72,189. Based on this data, I trained a random forest based on decision trees to predict the missing statistics. For this, I used the \textbf{Random Forest Regressor} model, which predicts continuous values for missing users. Numbers of \textit{commits} or \textit{reviews} performed are integers - the result is rounded to whole numbers.
-
-It is worth noting that model validation (an 80/20 split) revealed limited predictive power of the AIDev dataset's features with respect to a user's overall GitHub activity ($R^2$ in the range of 0.05–0.15, and in some cases negative), suggesting that both data sources describe partially different aspects of activity, and the values imputed for missing users should be treated with some caution.
-
-\section{Methodology}
-For each user, I determined a set of parameters describing their activity in the GitHub repository
-\begin{itemize}
-    \item The number of projects the user was involved in as a contributor.
-    \item The number of \textit{commits} made in public repositories over the last 5 years.
-    \item The number of \textit{commits} made in private repositories over the last 5 years.
-    \item The number of \textit{code reviews} performed over the last 5 years.
-    \item The number of the user's own repositories created over the last 5 years.
-    \item The number of \textit{followers}.
-    \item The maximum number of \textit{stars} earned by a single, own repository.
-    \item The maximum number of \textit{forks} of a single, own repository.
-    \item The account tenure on the GitHub platform (time since registration).
-    \item The number of \textit{pull requests} created, recorded in the \textbf{AIDev} dataset.
-    \item The total number of commits recorded in the \textbf{AIDev} dataset.
-    \item The number of code reviews performed, based on data from the \textbf{AIDev} dataset.
-    \item The number of reported \textit{issues} originating from the \textbf{AIDev} dataset.
-\end{itemize}
-
-\subsection{Preliminary approach}
-The initial classification approach was based on an independent analysis of each parameter using a simple scoring system. For each of the studied features, the median and the 90th percentile were determined, which served as reference points in the scoring process. Then a function was applied assigning scores on a scale from 0 to 4 points, given by the following formula:
-
-\[
-f(x) = \min(4, \max(0, y(P_{50}) + \frac{y(P_{90}) - y(P_{50})}{P_{90} - P_{50}}(x - P_{50})))
-\] 
-where P denotes the percentile function (i.e. $P_{50}$ is the median), and $y(P_{50}) = 1$ and $y(P_{90}) = 3$.
-The final score for a user was a linear combination of the points obtained across all considered categories. Based on this calculated total value, I made the final division of users into three experience groups: Junior, Mid, and Senior.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1 \linewidth]{distribution_plot_clean.png}
-    \caption*{Linear percentile-based scoring model}
-    \label{fig:distribution-plot}
-\end{figure}
-However, this method showed significant methodological flaws. First of all, it treated each parameter as completely independent, ignoring existing correlations. Moreover, this model was characterized by high arbitrariness - the percentile thresholds and the final division into three groups were based on subjectively chosen values, which made reliable statistical verification impossible.
-
-\subsection{Target approach}
-In the final stage of the analysis, an unsupervised statistical approach was applied in the form of the \textit{k-means} algorithm. The analyzed dataset consists exclusively of quantitative variables characterized by a significant spread of values (e.g. the number of public repositories ranges from 1 to 617,754). To mitigate this effect and ensure an equal influence of all variables on the clustering process, the data was subjected to a quantile transformation, bringing the distributions of the variables closer to normal, and standardization of features according to the formula:
-
-\[
-z = \frac{x - \mu}{\sigma}
-\]
-where $\mu$ denotes the arithmetic mean, and $\sigma$ the standard deviation of a given feature.
-
-In order to increase the stability and reliability of the results, outlier observations were removed from the dataset. For this, the \textbf{Isolation Forest} algorithm was used - an efficient algorithm for detecting anomalies, with the contamination parameter set at $1\%$. Then, in order to reduce noise and allow for a clear visualization of the multidimensional spaces, principal component analysis (\textbf{PCA}) was applied. Reducing the dimensionality to two principal components allowed for the preservation of key data structures while discarding $5\%$ of the variance, treated as informational noise. The data prepared in this way served as input to the \textit{k-means} algorithm.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{pca_1.png}
-    \caption{PCA PC1}
-    \label{fig:pca-pc1}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{pca_2.png}
-    \caption{PCA PC2}
-    \label{fig:pca-pc2}
-\end{figure}
-\subsection{How to properly choose the parameter k?}
-To select the optimal number of clusters, I used two methods:
-\begin{itemize}
-    \item \textbf{Gap Statistic}: A clustering quality assessment method that compares the total within-cluster variance of the real data with the expected variance for reference data generated from a uniform distribution.
-    
-    \item \textbf{Silhouette Method}: Measures how well each point fits into its cluster compared to neighboring clusters. This score oscillates between $1$ and $-1$, where higher values indicate better separated and denser clusters.
-\end{itemize}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{silnouette.png}
-    \caption*{Silhouette Method}
-    \label{fig:silhouette}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\linewidth]{gap_statistic.png}
-    \caption*{Gap statistic}
-    \label{fig:gap-statistic}
-\end{figure}
-
-Ultimately, I chose the value $k=3$. At $k=4$, a noticeable decrease in the quality of the split is observed, and choosing a low value of the parameter prevents excessive fragmentation of the data and the creation of subgroups that are difficult to interpret. Additionally, in the business world this is the most common division, namely into: Juniors, Mids, and Seniors.
-
-It is worth noting that the \textit{k-means} algorithm performs clustering in an unsupervised manner - it determines clusters but does not assign them specific labels. In order to give the groups meaning and assign them appropriate names, principal component analysis was used. It allowed for identifying the attributes with the greatest influence on the differentiation of the data. On this basis, the profiles of the individual clusters were interpreted:
-
-\begin{itemize}
-    \item \textbf{Juniors}: a group of users who achieved zero or minimal scores in the key variables.
-    
-    \item \textbf{Seniors}: a group comprising people with the highest values in the most important parameters.
-    \item \textbf{Mid}: an intermediate group, characterized by moderate scores in the analyzed metrics. 
-\end{itemize}
-
-\section{Results}
-
-\subsection{How does a developer's experience correlate with the frequency of using AI agents?}
-
-In order to assess the relationship between developers' level of experience and the frequency of using AI agents, a nonparametric Kruskal-Wallis test and post-hoc Mann-Whitney tests with Bonferroni correction were performed.
-
-The Kruskal-Wallis test showed a statistically significant difference in the frequency of generating \textit{pull requests} between the analyzed experience groups.
-
-The post-hoc analysis showed the following relationships:
-\begin{itemize}
-    \item The \textbf{Junior} group is characterized by a significantly lower frequency of using AI agents compared to the other groups.
-    \item No statistically significant differences were found between the \textbf{Mid} and \textbf{Senior} groups.
-\end{itemize}
-
-Developers at the \textbf{Mid} and \textbf{Senior} level use AI agents the most, achieving the highest median usage.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\linewidth]{summary.png}
-    \label{fig:summary-exp1}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\linewidth]{box_plot.png}
-    \label{fig:box_plot-exp1}
-\end{figure}
-
-\subsection{Does human experience translate into a higher acceptance rate of agent-generated code?}
-
-
-The analysis performed shows that a developer's level of experience affects the acceptance rate of code generated by AI agents. The Kruskal-Wallis test confirmed the existence of significant differences between the studied groups. A detailed analysis using post-hoc tests (Mann-Whitney U with Bonferroni correction) reveals the following relationships:
-
-\begin{itemize}
-    \item Developers at the \textbf{Mid} level achieve the highest average code acceptance rate as well as the highest median. 
-    
-    \item Code generated by \textbf{Seniors} shows a lower median acceptance rate among the other groups, but the tests did not show significant differences between the remaining groups ($p=0.43$ for \textbf{Juniors} and $p = 1.00$ for \textbf{Mids})
-\end{itemize}
-
-Based on the data, it can be concluded that human experience does not automatically translate into a higher code acceptance rate. Developers at the \textbf{Mid} level show the greatest effectiveness in accepting AI agent proposals.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{second_experiment_box_plot.png}
-    \label{fig:boxplot-exp2}
-\end{figure}
- \begin{figure}[H]
-     \centering
-     \includegraphics[width=1\linewidth]{second_boxplot.png}
-     \label{fig:summary-exp2}
- \end{figure}
-
-
-\subsection{Do changes introduced by the junior group using AI require more corrections (measured by the number of comments) from the project maintainer?}
-The analysis was based on counting comments left by maintainers within \textit{pull requests}. In cases where the author of a \textit{pull request} turned out to be a bot, the associated \textit{issue} was checked, and its creator was treated as the actual author of the changes.
-
-To verify this hypothesis, the \textbf{Kruskal-Wallis} test was used (robust to a large number of zero values in the data). The test confirmed the existence of statistical differences between all groups. Analysis using Mann-Whitney tests with Bonferroni correction showed that the differences are significant at every level of comparison:
-\begin{itemize}
-    \item \textbf{Junior} vs \textbf{Mid}: $p < 0.001$ 
-    \item \textbf{Junior} vs \textbf{Senior}: $p < 0.001$ 
-    \item \textbf{Mid} vs \textbf{Senior} $p < 0.001$
-\end{itemize}
-
-Code generated or supported by AI in the case of Juniors produced the lowest average number of comments. The highest rate was recorded in the \textbf{Mid} group. This result is somewhat surprising in the context of the hypothesis posed, and may result from the fact that Juniors create relatively simpler \textit{pull requests}, while Mids undertake more complex changes that generate more remarks from maintainers - not necessarily due to lower code quality.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{third_experiment_table.png}
-    \label{fig:table-exp3}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{third_experiment.png}
-    \label{fig:boxplot-exp3}
-\end{figure}
-
-This work was created as part of the 2025/2026 research project under the supervision of prof. Krzysztof Stencel.
+\input{1-intro}
+\input{2-related}
+\input{3-method}
+\input{4-results}
+\input{5-threats}
+\input{6-conclusions}
 
 \setbiblabelwidth{1000}
 \bibliographystyle{IEEEtran_for_EI} 
