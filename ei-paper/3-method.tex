@@ -4,12 +4,9 @@ We conducted an observational repository-mining study. The workflow comprised fo
 
 \subsection{Data sources and sample construction}
 
-We used the AIDev snapshot released for the MSR 2026 Mining Challenge \cite{li2026aidev}. The full-scope part of the snapshot contains 932,791 Agentic-PRs produced by five coding agents in 116,211 public GitHub repositories up to 1 August 2025 and links them to 72,189 developers. It provides pull-request metadata, repository information, and developer identifiers. Richer interaction data are available only for AIDev-pop, a curated subset of 33,596 Agentic-PRs from 2,807 repositories with more than 100 stars. In particular, issue-thread comments, formal reviews, inline review comments, commits, and related issues are limited to this subset. We therefore use the full-scope data for RQ1 and RQ2 and AIDev-pop for RQ3.
+We used the AIDev snapshot released for the MSR 2026 Mining Challenge \cite{li2026aidev} (Zenodo release v3, DOI \texttt{10.5281/zenodo.16919272}). The full-scope part of the snapshot contains 932,791 Agentic-PRs produced by five coding agents in 116,211 public GitHub repositories up to 1 August 2025 and links them to 72,189 developers. It provides pull-request metadata, repository information, and developer identifiers. Richer interaction data -- issue-thread comments, formal reviews, inline review comments, commits, and related issues -- are collected by AIDev only for AIDev-pop, a curated subset of 33,596 Agentic-PRs from 2,807 repositories with more than 100 stars; there is no full-scope alternative for that interaction data to fall back to. We therefore use the full-scope data for RQ1, RQ2 and RQ4, and AIDev-pop for RQ3.
 
-% AUTHOR ACTION: identify the exact AIDev release/tag used in the analysis and
-% record it together with the dataset DOI in the replication package.
-
-The activity visible in AIDev primarily describes developers in relation to agent-associated contributions. To obtain a broader activity profile, we enriched the developer records through the GitHub GraphQL API. Table~\ref{tab:profile-indicators} lists the 13 quantitative indicators used for clustering. The five-year indicators cover the five years preceding data collection. GitHub's restricted-contribution count was used as an indicator of private activity; because GitHub exposes only an aggregate selected by the account owner, this variable must not be interpreted as the exact number of private commits.
+The activity visible in AIDev primarily describes developers in relation to agent-associated contributions. To obtain a broader activity profile, we enriched the developer records through the GitHub GraphQL API. Table~\ref{tab:profile-indicators} lists the 12 quantitative indicators used for clustering. The five-year indicators cover the five years preceding data collection. GitHub's restricted-contribution count was used as an indicator of private activity; because GitHub exposes only an aggregate selected by the account owner, this variable must not be interpreted as the exact number of private commits.
 
 \begin{table}[tb]
     \centering
@@ -29,62 +26,46 @@ The activity visible in AIDev primarily describes developers in relation to agen
         Followers & Number of followers at the time of data collection. \\
         Maximum stars & Largest stargazer count among repositories owned by the developer. \\
         Maximum forks & Largest fork count among repositories owned by the developer. \\
-        Human pull requests & Number of human-authored pull requests associated with the developer in the study data. \\
-        Commits & Number of commits associated with the developer in the study data. \\
-        Reviews & Number of reviews associated with the developer in the study data. \\
-        Issues & Number of issues associated with the developer in the study data. \\
+        Agentic-PR activity span & Days between the developer's first and last Agentic-PR. \\
+        Agent diversity & Number of distinct coding agents used across the developer's Agentic-PRs. \\
+        Agentic-PR repository breadth & Number of distinct repositories in which the developer has an Agentic-PR. \\
         \bottomrule
     \end{tabularx}
 \end{table}
 
-% AUTHOR ACTION: verify the indicator names against the analysis code. The
-% original prose mentions repositories created during five years, whereas the
-% PCA output labels the corresponding variable as 5yr_prs_opened. The table
-% follows the variable name visible in the PCA output.
-% AUTHOR ACTION: record the GraphQL collection dates, exact query, pagination
-% procedure, software used, and treatment of deleted, renamed, and unavailable
-% accounts in the replication package.
+For each developer, activity indicators were collected via a single GitHub GraphQL API v4 query per login, retrieving \texttt{followers}, \texttt{repositoriesContributedTo}, and yearly \texttt{contributionsCollection} aggregates (public commits, restricted contributions, pull-request reviews, and pull requests opened) for each of the five years preceding collection; because these are scalar aggregate fields rather than paginated connections, no pagination was required. Queries were issued sequentially with a 0.2-second delay per login using Python and the \texttt{requests} library. A login was recorded as unavailable -- covering deleted, renamed, and otherwise inaccessible accounts -- whenever the API returned a non-200 status, an error payload, or a null user, and such logins were skipped without retry; the corresponding developers are exactly the ones whose indicators were later estimated via random-forest imputation, described next. The GraphQL collection was run on 6 May 2026, roughly nine months after the AIDev snapshot's own 1 August 2025 cutoff; profile-level indicators such as followers, account tenure, and the yearly contribution aggregates therefore reflect each account's state as of the later collection date rather than the state at the time of the developer's Agentic-PRs, and may include activity that occurred after the snapshot window.
 
-The GraphQL collection yielded activity records for 70,486 of the 72,189 developers (97.64\%). Numeric indicators for the remaining 1,703 developers were estimated using random-forest regression models \cite{breiman2001random}. The models were evaluated with an 80/20 train--test split, and predicted count values were rounded to integers. Their predictive performance was limited: the observed $R^2$ values were generally between 0.05 and 0.15 and were negative for some indicators. The imputed values should therefore be regarded as approximate coverage of missing profiles rather than reliable reconstructions of their activity.
-
-% AUTHOR ACTION: report the predictor set, one-model-versus-multiple-model
-% design, hyperparameters, random seed, and error measures for every imputed
-% indicator. Add a complete-case sensitivity analysis excluding the 1,703
-% imputed developers.
+The GraphQL collection yielded activity records for 70,434 of the 72,189 developers (97.57\%). Numeric indicators for the remaining 1,755 developers were estimated using random-forest regression models \cite{breiman2001random}. The models were evaluated with an 80/20 train--test split, and predicted count values were rounded to integers. Their predictive performance was limited: the observed $R^2$ values were \texttt{collab\_breadth} 0.098, \texttt{5yr\_prs\_opened} 0.088, \texttt{5yr\_reviews\_given} 0.020, \texttt{5yr\_public\_commits} $-0.073$, and \texttt{5yr\_private\_work} $-0.272$. The imputed values should therefore be regarded as approximate coverage of missing profiles rather than reliable reconstructions of their activity.
 
 \subsection{Preprocessing and activity-profile construction}
 
-The indicators were strongly right-skewed and differed by several orders of magnitude. We first applied a quantile transformation toward a normal marginal distribution and then standardized every feature to zero mean and unit variance. We next used Isolation Forest with the contamination parameter set to 1\% to remove the most anomalous profiles \cite{liu2008isolation}. This procedure removed 722 developers and left 71,467 profiles for the primary analysis.
+The indicators were strongly right-skewed and differed by several orders of magnitude. We applied a $\log(1+x)$ transformation and then standardized every feature to zero mean and unit variance. We next used Isolation Forest with the contamination parameter set to 1\% to remove the most anomalous profiles \cite{liu2008isolation}. This procedure removed 722 developers and left 71,467 profiles for the primary analysis.
 
-Principal component analysis (PCA) was applied to the transformed indicators to account for their correlations and obtain a lower-dimensional representation \cite{jolliffe2016principal}. The first two principal components retained approximately 95\% of the variance and served as input to the clustering algorithm. As shown in Figure~\ref{fig:pca-loadings}, the first component loaded positively on the activity indicators and was interpreted as a general-activity axis. The second component primarily contrasted repository visibility, represented by stars and forks, with direct contribution and review activity.
+A quantile transformation toward a normal marginal distribution was tried first in place of $\log(1+x)$, but a complete-case sensitivity check (Section~\ref{sec:threats}) found it unstable: clustering only the developers with real, non-imputed GraphQL data agreed with clustering the full population, on the same overlapping developers, at only Adjusted Rand Index $=0.46$. The same check with $\log(1+x)$ gave Adjusted Rand Index $=0.98$, so $\log(1+x)$ was adopted instead.
+
+Principal component analysis (PCA) was computed on the transformed indicators to aid interpretation of the dominant axes of variation, not as a dimensionality-reduction step feeding the clustering algorithm \cite{jolliffe2016principal}: the first two principal components retain only approximately 50\% of the variance, so a 2-component projection would discard roughly half the signal. Clustering was therefore performed directly on the full 12-dimensional cleaned representation; PCA(2) is reported separately, purely to visualize which indicators drive the two dominant axes. As shown in Figure~\ref{fig:pca-loadings}, the first component loaded positively on the activity indicators and was interpreted as a general-activity axis. The second component contrasted agent-associated activity and public contribution volume (Agentic-PR activity span, Agentic-PR repository breadth, agent diversity, pull requests opened, and public commits) against general reputation and reviewing activity (followers, account tenure, maximum stars and forks, restricted activity, and reviews submitted).
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.92\linewidth]{pca_1.png}
     \vspace{0.5em}
     \includegraphics[width=0.92\linewidth]{pca_2.png}
-    \caption{Loadings of the activity indicators on the two retained principal components. PC1 primarily represents general GitHub activity, whereas PC2 contrasts repository visibility with direct contribution and review activity.}
+    \caption{Loadings of the activity indicators on the two dominant axes of variation (PC1, PC2), computed for interpretation only; PC1+PC2 retain approximately 50\% of the variance and are not used as the clustering input. PC1 primarily represents general GitHub activity, whereas PC2 contrasts agent-associated activity and public contribution volume against general reputation and reviewing activity.}
     \label{fig:pca-loadings}
 \end{figure}
 
-The two-component representation was partitioned using $k$-means clustering \cite{lloyd1982least}. We examined candidate solutions for $k=2,\ldots,10$ using average silhouette width \cite{rousseeuw1987silhouettes} and the gap statistic \cite{tibshirani2001gap}. Figure~\ref{fig:cluster-diagnostics} shows that neither diagnostic identifies $k=3$ as a unique numerical optimum: the largest observed silhouette value occurs at $k=9$, while the gap statistic continues to increase toward the upper end of the evaluated range. We nevertheless retained $k=3$ as a deliberately coarse and interpretable operationalization suited to comparisons among low-, intermediate-, and high-activity profiles. Thus, the analysis is conditional on this design choice and does not claim that three clusters constitute the intrinsic structure of the developer population.
+The full 12-dimensional cleaned representation was partitioned using $k$-means clustering \cite{lloyd1982least}. We examined candidate solutions for $k=2,\ldots,10$ using average silhouette width \cite{rousseeuw1987silhouettes} and the gap statistic \cite{tibshirani2001gap}, computed on that same 12-dimensional representation. Figure~\ref{fig:cluster-diagnostics} shows that $k=3$ is not the numerical optimum on either diagnostic: silhouette width is highest at $k=2$ (0.332), decreases at $k=3$ (0.294), rises slightly at $k=4$ (0.302), and then declines further for larger $k$; the gap statistic increases roughly monotonically across the whole range and is highest at $k=10$ (2.58). We nevertheless retained $k=3$ as a deliberately coarse and interpretable operationalization suited to comparisons among low-, intermediate-, and high-activity profiles. Thus, the analysis is conditional on this design choice and does not claim that three clusters constitute the intrinsic structure of the developer population.
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.90\linewidth]{silnouette.png}
     \vspace{0.5em}
     \includegraphics[width=0.90\linewidth]{gap_statistic.png}
-    \caption{Silhouette and gap-statistic diagnostics for candidate values of $k$. The diagnostics do not establish three clusters as the numerical optimum; $k=3$ is retained as an interpretability-constrained design choice.}
+    \caption{Silhouette and gap-statistic diagnostics for candidate values of $k$, computed on the 12-dimensional clustering input. $k=3$ is not the numerical optimum on either diagnostic; it is retained as an interpretability-constrained design choice.}
     \label{fig:cluster-diagnostics}
 \end{figure}
 
-The clusters were ordered by their positions on the general-activity component and by the corresponding values of the original indicators. For readability, we refer to the low-, intermediate-, and high-activity profiles as \emph{Junior}, \emph{Mid}, and \emph{Senior}, respectively. They contain 53,327, 16,192, and 1,948 developers. These names denote relative GitHub activity profiles within the analyzed population; they are not verified job titles, career stages, or direct measurements of programming competence.
-
-% AUTHOR ACTION: report all preprocessing and clustering parameters, including
-% the quantile-transform settings, PCA solver, k-means initialization, n_init,
-% convergence tolerance, software versions, and random seeds. Add sensitivity
-% analyses for alternative values of k, repeated initializations, retention of
-% outliers, and exclusion of the AIDev-derived activity indicators.
+The clusters were ordered by the summed value of the 12 standardized indicators and by the corresponding values of the original indicators. For readability, we refer to the low-, intermediate-, and high-activity profiles as \emph{Junior}, \emph{Mid}, and \emph{Senior}, respectively. They contain 44,854, 12,705, and 13,908 developers. These names denote relative \emph{overall} GitHub activity profiles within the analyzed population -- the composite of all 12 indicators, not any single one -- and are not verified job titles, career stages, or direct measurements of programming competence. This distinction matters concretely for RQ1: the Mid profile turns out to have the highest median Agentic-PR count of the three (Section~\ref{sec:results}), even though it ranks below Senior on the composite activity score that names the clusters, because that score also reflects indicators (followers, account tenure, repository stars and forks) on which Senior scores higher.
 
 \subsection{Outcome measures}
 
@@ -96,29 +77,16 @@ For each developer, we counted the number of Agentic-PRs associated with that de
 \paragraph{RQ2: pull-request acceptance.}
 For each developer, we calculated the proportion of resolved Agentic-PRs that were merged. A pull request was classified as merged when its \texttt{merged\_at} field was non-null and as rejected when it was closed without being merged. Open pull requests were excluded from the denominator rather than treated as rejected. Developers without a resolved Agentic-PR were excluded from this analysis. This outcome concerns acceptance of pull requests, not correctness of individual generated lines or overall code quality.
 
-% AUTHOR ACTION: verify that the existing analysis code uses merged_at and
-% excludes open pull requests exactly as stated here; otherwise rerun RQ2.
-
 \paragraph{RQ3: review-discussion volume.}
 Detailed discussion artifacts are not available in the full-scope tables, so this analysis is restricted to AIDev-pop. We use the \texttt{pr\_comments} table, which contains issue-thread comments associated with pull requests. Formal review records and inline review comments are not included in the primary measure. When a bot-authored pull request is linked to an issue, the issue creator is used as the human developer associated with the contribution, following the mapping rule used in the original analysis. Pull requests that cannot be mapped to one of the activity profiles are excluded.
 
 For each retained Agentic-PR, we count non-bot comments written by an account other than the mapped developer; pull requests without a matching comment record receive a count of zero. The public AIDev fields do not provide a reproducible maintainer-role indicator for these commenters. We therefore interpret the outcome as \emph{external human discussion}, not as comments verified to have been written by maintainers. We aggregate the pull-request counts within each developer by computing the mean number of external comments per Agentic-PR. This avoids treating multiple contributions by the same developer as independent observations. The resulting measure is a proxy for visible discussion volume, not a direct count of requested corrections, review effort, defects, or code quality.
 
-% AUTHOR ACTION: RQ3 must be recomputed on AIDev-pop under the definition above.
-% The currently reported sample of 830,783 pull requests cannot be obtained from
-% the public AIDev comment tables. If a separate full-scope GitHub crawl was
-% performed, replace this subsection with its endpoints, dates, coverage,
-% joins, bot filtering, and reproducible criterion for maintainer status.
-% As a sensitivity analysis, consider adding non-empty top-level review bodies
-% from pr_reviews and inline comments from pr_review_comments_v2.
+\paragraph{RQ4: Agentic-PR acceptance vs.\ a human-authored baseline.}
+AIDev separately provides \texttt{human\_pull\_request}, a baseline sample of human-authored pull requests (i.e.\ without agent involvement) drawn from repositories with more than 500 stars. We initially considered stratifying this comparison by the same Junior/Mid/Senior profiles used in RQ1--RQ3, but the two author populations overlap only marginally: of the 2,515 distinct authors in \texttt{human\_pull\_request}, only 351 also appear among the 72,189 developers linked to Agentic-PRs. RQ4 therefore compares two independent populations rather than matched individuals: the acceptance rate of all Agentic-PRs (as in RQ2, pooled across activity profiles) against the acceptance rate of \texttt{human\_pull\_request}, using the same merged/rejected/open-PR handling as RQ2. This is a population-level, not a developer-matched, comparison, and the human-authored baseline is itself restricted to a narrower, higher-star repository sample than the full Agentic-PR population.
 
 \subsection{Statistical analysis}
 
-The outcome distributions were strongly non-normal, and the count-based measures contained many ties and zeros. For each research question, we first use the Kruskal--Wallis test to assess whether the outcome distributions differ across the three activity profiles. A significant omnibus result is followed by two-sided pairwise Mann--Whitney $U$ tests. The three pairwise comparisons within each research question are adjusted using the Bonferroni correction, with a family-wise significance level of $\alpha=0.05$.
+The outcome distributions were strongly non-normal, and the count-based measures contained many ties and zeros. For RQ1--RQ3, each comparing three activity profiles, we first use the Kruskal--Wallis test to assess whether the outcome distributions differ across the three groups. A significant omnibus result is followed by two-sided pairwise Mann--Whitney $U$ tests, with the three pairwise comparisons per research question adjusted using the Bonferroni correction, at a family-wise significance level of $\alpha=0.05$. RQ4 compares only two independent groups (Agentic-PRs vs.\ the human-authored baseline), so a single two-sided Mann--Whitney $U$ test is used directly, without a Kruskal--Wallis omnibus step or a Bonferroni correction.
 
-For every group, we report the sample size, mean, standard deviation, and median. Because the large samples make very small differences statistically detectable, we accompany $p$-values with effect sizes: epsilon-squared for the Kruskal--Wallis test and rank-biserial correlation for pairwise comparisons. All analyses concern associations between activity-based profiles and observed outcomes; the observational design does not support causal claims about the effect of professional experience.
-
-% AUTHOR ACTION: add exact post-filtering sample sizes for every RQ and report
-% the H and U statistics, adjusted p-values, effect sizes, and preferably
-% confidence intervals in Results. Check the robustness of conclusions on the
-% complete-case sample and under alternative profile constructions.
+For every group, we report the sample size, mean, standard deviation, and median. Because the large samples make very small differences statistically detectable, we accompany $p$-values with effect sizes: epsilon-squared for the Kruskal--Wallis test and rank-biserial correlation for pairwise comparisons. Each effect size is reported with a 95\% confidence interval obtained by nonparametric bootstrap: for epsilon-squared, we resample each group independently with replacement, recompute the Kruskal--Wallis statistic, and take the 2.5th and 97.5th percentiles over 2,000 resamples; the same procedure, applied to the two groups being compared, is used for each pairwise rank-biserial correlation. All analyses concern associations between activity-based profiles and observed outcomes; the observational design does not support causal claims about the effect of professional experience.
