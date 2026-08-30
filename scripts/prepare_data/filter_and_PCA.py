@@ -14,28 +14,38 @@ features = df.drop(columns=['login'])
 
 features_log = np.log1p(features)
 
-iso_forest = IsolationForest(contamination=0.01, random_state=42)
-outlier_labels = iso_forest.fit_predict(features_log)
+scaler = StandardScaler()
+features_scaled = pd.DataFrame(scaler.fit_transform(features_log), columns=features.columns, index=features.index)
 
-features_clean = features_log[outlier_labels == 1]
+iso_forest = IsolationForest(contamination=0.01, random_state=42)
+outlier_labels = iso_forest.fit_predict(features_scaled)
+
+features_clean = features_scaled[outlier_labels == 1]
 logins_clean = logins[outlier_labels == 1]
 
-scaler = StandardScaler()
-data_scaled = scaler.fit_transform(features_clean)
+print(f"Removed {(outlier_labels == -1).sum()} outliers via Isolation Forest; "
+      f"{len(features_clean)} profiles remain.")
 
 pca = PCA(n_components=2)
-data_pca = pca.fit_transform(data_scaled)
+data_pca = pca.fit_transform(features_clean)
+
+print(f"Explained variance ratio (PC1, PC2): {pca.explained_variance_ratio_}, "
+      f"total: {pca.explained_variance_ratio_.sum():.4f}")
 
 df_final = pd.DataFrame(
-    data_pca, 
+    data_pca,
     columns=['Principal_Component_1', 'Principal_Component_2']
 )
 df_final['login'] = logins_clean.values
-df_final.to_csv('../../data/prepare_data/preprocessed_data.csv', index=False)
+df_final.to_csv('../../data/prepare_data/preprocessed_data_pca2d.csv', index=False)
+
+features_clean.assign(login=logins_clean.values).to_csv(
+    '../../data/prepare_data/preprocessed_data_12d.csv', index=False
+)
 
 loadings = pd.DataFrame(
-    pca.components_.T, 
-    columns=['PC1', 'PC2'], 
+    pca.components_.T,
+    columns=['PC1', 'PC2'],
     index=features_clean.columns
 )
 

@@ -1,8 +1,8 @@
 import pandas as pd
 from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler, QuantileTransformer
 
-df = pd.read_csv('../../data/prepare_data/preprocessed_data.csv')
+
+df = pd.read_csv('../../data/prepare_data/preprocessed_data_12d.csv')
 features_df = df.drop(columns=['login']).apply(pd.to_numeric, errors='coerce')
 features_df = features_df.fillna(features_df.median())
 

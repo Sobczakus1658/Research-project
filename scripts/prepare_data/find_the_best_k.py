@@ -3,17 +3,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
-from sklearn.preprocessing import StandardScaler, QuantileTransformer
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import IsolationForest
 
 df = pd.read_csv('../../data/prepare_data/final_combined_data.csv')
+df = df.dropna(subset=['login'])
+df = df.fillna(0)
 
 features = df.drop(columns=['login']).apply(pd.to_numeric, errors='coerce')
 features = features.fillna(features.median())
 
-qt = QuantileTransformer(output_distribution='normal', random_state=42)
-features_qt = qt.fit_transform(features)
+features_log = np.log1p(features)
+features_scaled = StandardScaler().fit_transform(features_log)
 
-X = StandardScaler().fit_transform(features_qt)
+iso_forest = IsolationForest(contamination=0.01, random_state=42)
+outlier_labels = iso_forest.fit_predict(features_scaled)
+X = features_scaled[outlier_labels == 1]
+
+print(f"Removed {(outlier_labels == -1).sum()} outliers via Isolation Forest; "
+      f"{len(X)} profiles used for k diagnostics.")
+
 
 def wk(X, k):
     km = KMeans(n_clusters=k, init='k-means++', random_state=42, n_init=10)
@@ -49,9 +58,12 @@ sil = [
     for k in k_range
 ]
 
+for k, s, g in zip(k_range, sil, gaps):
+    print(f"k={k}: silhouette={s:.4f}, gap={g:.4f}")
+
 plt.figure(figsize=(10, 5))
 plt.plot(k_range, gaps, marker='o')
-plt.title('Gap Statistic (Quantile Transformed + Scaled)')
+plt.title('Gap Statistic (log1p + Scaled, 12-D)')
 plt.xlabel('k')
 plt.ylabel('Gap')
 plt.grid(True)
@@ -61,7 +73,7 @@ plt.show()
 
 plt.figure(figsize=(10, 5))
 plt.plot(k_range, sil, marker='o', color='green')
-plt.title('Silhouette Score (Quantile Transformed + Scaled)')
+plt.title('Silhouette Score (log1p + Scaled, 12-D)')
 plt.xlabel('k')
 plt.ylabel('Score')
 plt.grid(True)
