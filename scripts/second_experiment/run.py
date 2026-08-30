@@ -41,6 +41,9 @@ def run_second_experiment():
 
     summary_stats.to_csv('../../data/second_experiment/second_experiment_summary_stats.csv')
 
+    def rank_biserial(u_stat, n1, n2):
+        return 1 - (2 * u_stat) / (n1 * n2)
+
     juniors = merged_df[merged_df['experience'] == 'Junior']['acceptance_rate'].dropna()
     mids = merged_df[merged_df['experience'] == 'Mid']['acceptance_rate'].dropna()
     seniors = merged_df[merged_df['experience'] == 'Senior']['acceptance_rate'].dropna()
@@ -50,9 +53,12 @@ def run_second_experiment():
     print("==========================================================")
 
     kw_stat, kw_p = stats.kruskal(juniors, mids, seniors)
+    n_total = len(juniors) + len(mids) + len(seniors)
+    epsilon_sq = kw_stat / (n_total - 1)
     print(f"1. Kruskal-Wallis Test (for 3 groups):")
     print(f"   - H-statistic: {kw_stat:.4f}")
     print(f"   - p-value:     {kw_p:.4e}")
+    print(f"   - epsilon-squared effect size: {epsilon_sq:.4f}")
 
     alpha = 0.05
     if kw_p < alpha:
@@ -68,10 +74,11 @@ def run_second_experiment():
         ]
         
         for g1, g2, d1, d2 in pairs:
-            u_stat, p_val = stats.mannwhitneyu(d1, d2, alternative='greater')
-            print(f"   * Test {g1} > {g2}: U={u_stat:.1f}, p-value={p_val:.4e}")
+            u_stat, p_val = stats.mannwhitneyu(d1, d2, alternative='two-sided')
+            r_rb = rank_biserial(u_stat, len(d1), len(d2))
+            print(f"   * Test {g1} vs {g2}: U={u_stat:.1f}, p-value={p_val:.4e}, rank-biserial r={r_rb:.4f}")
             if p_val < bonf_alpha:
-                print(f"     -> CONCLUSION: The {g1} group has a SIGNIFICANTLY HIGHER acceptance rate than {g2}.")
+                print(f"     -> CONCLUSION: Significant difference in acceptance rate between {g1} and {g2}.")
             else:
                 print(f"     -> CONCLUSION: No significant difference between {g1} and {g2}.")
     else:
