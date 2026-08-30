@@ -73,9 +73,14 @@ def run_third_experiment():
     print("      STATISTICAL SIGNIFICANCE ANALYSIS                   ")
     print("==========================================================")
 
+    def rank_biserial(u_stat, n1, n2):
+        return 1 - (2 * u_stat) / (n1 * n2)
+
     kw_stat, kw_p = stats.kruskal(juniors, mids, seniors)
+    n_total = len(juniors) + len(mids) + len(seniors)
+    epsilon_sq = kw_stat / (n_total - 1)
     print(f"Kruskal-Wallis Test (for all 3 groups):")
-    print(f"  H-statistic = {kw_stat:.4f}, p-value = {kw_p:.4e}")
+    print(f"  H-statistic = {kw_stat:.4f}, p-value = {kw_p:.4e}, epsilon-squared = {epsilon_sq:.4f}")
     if kw_p < 0.05:
         print("  -> Result: There is a statistically significant difference between at least two groups (p < 0.05).\n")
     else:
@@ -91,7 +96,8 @@ def run_third_experiment():
     for g1_name, g2_name, g1_data, g2_data in pairs:
         if len(g1_data) > 0 and len(g2_data) > 0:
             u_stat, p_val = stats.mannwhitneyu(g1_data, g2_data, alternative='two-sided')
-            print(f"  * {g1_name} vs {g2_name}: U = {u_stat:.1f}, p-value = {p_val:.4e}")
+            r_rb = rank_biserial(u_stat, len(g1_data), len(g2_data))
+            print(f"  * {g1_name} vs {g2_name}: U = {u_stat:.1f}, p-value = {p_val:.4e}, rank-biserial r = {r_rb:.4f}")
             if p_val < 0.0167:
                 print(f"    -> The difference between {g1_name} and {g2_name} is STATISTICALLY SIGNIFICANT.")
             else:
