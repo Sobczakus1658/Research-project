@@ -29,13 +29,11 @@ Wszystkie niezbędne skrypty znajdziesz w folderze `scripts/prepare_data`.
 3. **Połącz** wszystkie pliki `result_*.csv` z `data/result/` w jeden plik `data_from_github.csv` i umieść go w `data/prepare_data/data_from_github.csv`.
 
 ### **Krok 2: Przygotowanie pliku CSV z danych z AIDEV**
-1. Uruchom skrypt `collect_data.sql` z folderu `scripts/prepare_data` (tworzy najpierw widok `repository_owners`
-   wyprowadzony z `all_repository.full_name`, bo taka tabela nie istnieje natywnie w AIDev), a wynik zapytania
+1. Uruchom skrypt `collect_data.sql` z folderu `scripts/prepare_data`, a wynik zapytania
    zapisz jako `data/prepare_data/data_from_aidev.csv` (z nagłówkiem - kolumny muszą odpowiadać nazwom z zapytania:
    `login, followers, max_stars, max_forks, account_age, agent_activity_span_days, agent_diversity,
    agentic_repo_breadth`).
-   `agent_activity_span_days`/`agent_diversity`/`agentic_repo_breadth` liczone są z `all_pull_request`
-   (pełny zasięg, wszyscy 72 189 developerów).
+`agent_activity_span_days`/`agent_diversity`/`agentic_repo_breadth` liczone są z `all_pull_request`.
 
 ### **Krok 3: Połączenie zbiorów i uzupełnienie braków danych**
 1. Upewnij się, że posiadasz już pliki:
@@ -47,7 +45,7 @@ Wszystkie niezbędne skrypty znajdziesz w folderze `scripts/prepare_data`.
    python3 random_forest.py
    ```
    Skrypt najpierw robi split 80/20 na wspólnym zbiorze i liczy R² per wskaźnik (zapisuje do
-   `data/prepare_data/random_forest_eval_r2.csv` - to są liczby do zaraportowania w metodyce), a dopiero
+   `data/prepare_data/random_forest_eval_r2.csv`), a dopiero
    potem doucza model na 100% wspólnych danych i tym modelem uzupełnia braki. Wynik główny zapisze się jako
    `data/prepare_data/final_combined_data.csv`.
 
@@ -57,9 +55,9 @@ Wszystkie niezbędne skrypty znajdziesz w folderze `scripts/prepare_data`.
    python3 find_the_best_k.py
    ```
    Skrypt wczytuje `data/prepare_data/final_combined_data.csv` i stosuje: `log1p` → standaryzacja →
-   `IsolationForest` (contamination=0.01) — bez PCA. Gap Statistic i Silhouette Score dla
+   `IsolationForest` (contamination=0.01). Gap Statistic i Silhouette Score dla
    $k \in \{2, 3, \dots, 10\}$ liczone są na pełnej, 12-wymiarowej, oczyszczonej reprezentacji, na której
-   `k_means.py` faktycznie klastruje. Wyniki (wykresy) zapisują się w `results/gap_statistic_transformed.png`
+   `k_means.py` faktycznie klastruje. Wyniki zapisują się w `results/gap_statistic_transformed.png`
    oraz `results/silhouette_score_transformed.png`. Na tej podstawie wybierz liczbę klastrów użytą w kroku 6.
 
 ### **Krok 5: Czyszczenie danych, właściwe dane do klastrowania i PCA do wizualizacji**
@@ -71,9 +69,8 @@ Wszystkie niezbędne skrypty znajdziesz w folderze `scripts/prepare_data`.
    prawoskośnych, zero-inflated cech) i standaryzację, usuwa outlierów metodą `IsolationForest`
    (contamination=0.01). Oczyszczoną, 12-wymiarową reprezentację zapisuje jako
    `data/prepare_data/preprocessed_data_12d.csv` — **to jest wejście do klastrowania** w kroku 6.
-   Dodatkowo, wyłącznie do wizualizacji/interpretacji (nie do klastrowania — PCA(2) zachowuje tylko
-   ~50% wariancji), liczy PCA(2) na tych samych oczyszczonych danych i zapisuje jako
-   `data/prepare_data/preprocessed_data_pca2d.csv`, a wykresy wpływu zmiennych na PC1/PC2 (loadings)
+   Dodatkowo, obliczane jest PCA (2) do wizualizacji danych i zapisywane jako
+   `data/prepare_data/preprocessed_data_pca2d.csv`, a wykresy wpływu zmiennych na PC1/PC2
    zapisuje w `results/pca_pc1.png` i `results/pca_pc2.png`.
 
 ### **Krok 6: Algorytm k-means**
@@ -81,8 +78,7 @@ Wszystkie niezbędne skrypty znajdziesz w folderze `scripts/prepare_data`.
    ```
    python3 k_means.py
    ```
-   Skrypt wczytuje `data/prepare_data/preprocessed_data_12d.csv` (pełna 12-wymiarowa oczyszczona
-   reprezentacja, **nie** PCA) i klastruje użytkowników (domyślnie na 3 grupy) bezpośrednio na tych 12
+   Skrypt wczytuje `data/prepare_data/preprocessed_data_12d.csv` i klastruje użytkowników (domyślnie na 3 grupy) bezpośrednio na tych 12
    wymiarach. Wynikiem jest plik `data/prepare_data/user_experience_levels.csv` zawierający mapowanie:
    `login -> experience` (Junior, Mid, Senior).
 
@@ -117,8 +113,7 @@ Skrypty znajdują się w katalogu `scripts/second_experiment/`.
 ### Eksperyment 3 - liczba komentarzy maintainerów a poziom doświadczenia
 Skrypty znajdują się w katalogu `scripts/third_experiment/`.
 1. Uruchom `data_to_third_experiment.sql` — ograniczone do AIDev-pop (tabela `pull_request`), liczy
-   inline comments z `pr_review_comments_v2` (nie z `pr_review_comments` — ta druga jest niekompletna
-   wg dokumentacji AIDev) — i wynik zapisz **z nagłówkiem** jako
+   inline comments z `pr_review_comments_v2` i wynik zapisz **z nagłówkiem** jako
    `data/third_experiment/data_to_third_experiment.csv` (kolumny: real_human_author,
    pull_request_id, comments_by_human_maintainers).
 2. Uruchom `run.py` - testy statystyczne (Kruskal-Wallis + Mann-Whitney dwustronny, epsilon-squared i
@@ -147,8 +142,7 @@ Skrypty w `scripts/sensitivity_analysis/`. Działają na plikach już wygenerowa
 pipeline (`data/prepare_data/`, `data/{first,second,third,fourth}_experiment/`), bez potrzeby dostępu
 do surowego AIDev.
 
-- **`preprocessing_stability_check.py`** — porównuje stabilność klastrowania (Adjusted Rand Index
-  między klastrowaniem pełnej populacji a populacją bez developerów z imputowanymi danymi) dla
+- **`preprocessing_stability_check.py`** — porównuje stabilność klastrowania dla
   `QuantileTransformer` i dla `log1p`.
 - **`clustering_sensitivity_checks.py`** — cztery testy: alternatywne k (2/4/5), powtórzone
   inicjalizacje (5 seedów), zatrzymanie outlierów (bez Isolation Forest), wykluczenie 3 wskaźników
