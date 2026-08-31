@@ -185,13 +185,11 @@ All the necessary scripts can be found in the `scripts/prepare_data` folder.
 3. **Merge** all `result_*.csv` files from `data/result/` into a single file `data_from_github.csv` and place it in `data/prepare_data/data_from_github.csv`.
 
 ### **Step 2: Preparing the CSV file from the AIDEV data**
-1. Run the `collect_data.sql` script from the `scripts/prepare_data` folder (it first creates a
-   `repository_owners` view derived from `all_repository.full_name`, since AIDev has no such table
-   natively), and save the query result as `data/prepare_data/data_from_aidev.csv` (with a header - the
-   columns must match the names from the query: `login, followers, max_stars, max_forks, account_age,
-   agent_activity_span_days, agent_diversity, agentic_repo_breadth`).
-   `agent_activity_span_days`/`agent_diversity`/`agentic_repo_breadth` are computed from
-   `all_pull_request` (full scope, all 72,189 developers).
+1. Run the `collect_data.sql` script from the `scripts/prepare_data` folder, and save the query result as
+   `data/prepare_data/data_from_aidev.csv` (with a header - the columns must match the names from the
+   query: `login, followers, max_stars, max_forks, account_age, agent_activity_span_days, agent_diversity,
+   agentic_repo_breadth`).
+`agent_activity_span_days`/`agent_diversity`/`agentic_repo_breadth` are computed from `all_pull_request`.
 
 ### **Step 3: Merging the datasets and filling in missing data**
 1. Make sure you already have the files:
@@ -203,9 +201,9 @@ All the necessary scripts can be found in the `scripts/prepare_data` folder.
    python3 random_forest.py
    ```
    The script first does an 80/20 split on the overlapping users and reports R² per indicator (saved to
-   `data/prepare_data/random_forest_eval_r2.csv` — these are the numbers to report in the methodology),
-   then refits on 100% of the overlapping users and uses that model to impute the missing values. The main
-   result is saved as `data/prepare_data/final_combined_data.csv`.
+   `data/prepare_data/random_forest_eval_r2.csv`), then refits on 100% of the overlapping users and uses
+   that model to impute the missing values. The main result is saved as
+   `data/prepare_data/final_combined_data.csv`.
 
 ### **Step 4: Determining the optimal number of clusters**
 1. Run the script:
@@ -213,9 +211,9 @@ All the necessary scripts can be found in the `scripts/prepare_data` folder.
    python3 find_the_best_k.py
    ```
    The script loads `data/prepare_data/final_combined_data.csv` and applies: `log1p` → standardization →
-   `IsolationForest` (contamination=0.01) — no PCA. The Gap Statistic and Silhouette Score for
+   `IsolationForest` (contamination=0.01). The Gap Statistic and Silhouette Score for
    $k \in \{2, 3, \dots, 10\}$ are computed on the full 12-D cleaned representation that `k_means.py`
-   actually clusters on. The results (plots) are saved to `results/gap_statistic_transformed.png` and
+   actually clusters on. The results are saved to `results/gap_statistic_transformed.png` and
    `results/silhouette_score_transformed.png`. Use these to choose the number of clusters used in Step 6.
 
 ### **Step 5: Data cleaning, clustering input, and PCA for visualization**
@@ -227,20 +225,19 @@ All the necessary scripts can be found in the `scripts/prepare_data` folder.
    right-skew / zero-inflation in the indicators) and standardization, and removes outliers using the
    `IsolationForest` method (contamination=0.01). The cleaned 12-D representation is saved as
    `data/prepare_data/preprocessed_data_12d.csv` -- **this is the clustering input** used in Step 6.
-   Separately, purely for visualization/interpretation (not for clustering — PCA(2) retains only ~50% of
-   variance), it computes PCA(2) on the same cleaned data and saves it as
-   `data/prepare_data/preprocessed_data_pca2d.csv`, and saves the PC1/PC2 loadings plots to
-   `results/pca_pc1.png` and `results/pca_pc2.png`.
+   Additionally, PCA(2) is computed for visualization and saved as
+   `data/prepare_data/preprocessed_data_pca2d.csv`, and the plots of variable influence on PC1/PC2 are
+   saved to `results/pca_pc1.png` and `results/pca_pc2.png`.
 
 ### **Step 6: K-means algorithm**
 1. Run the script:
    ```
    python3 k_means.py
    ```
-   The script loads `data/prepare_data/preprocessed_data_12d.csv` (the full 12-D cleaned representation,
-   **not** PCA) and clusters the users (into 3 groups by default) directly on those 12 dimensions. The
-   result is the file `data/prepare_data/user_experience_levels.csv`, containing the mapping:
-   `login -> experience` (Junior, Mid, Senior).
+   The script loads `data/prepare_data/preprocessed_data_12d.csv` and clusters the users (into 3 groups by
+   default) directly on those 12 dimensions. The result is the file
+   `data/prepare_data/user_experience_levels.csv`, containing the mapping: `login -> experience`
+   (Junior, Mid, Senior).
 
 ---
 
@@ -273,8 +270,7 @@ Scripts are located in the `scripts/second_experiment/` directory.
 ### Experiment 3 - number of maintainer comments vs. experience level
 Scripts are located in the `scripts/third_experiment/` directory.
 1. Run `data_to_third_experiment.sql` — restricted to AIDev-pop (`pull_request` table), counts inline
-   comments from `pr_review_comments_v2` (not `pr_review_comments`, which the AIDev documentation flags
-   as incomplete) — and save the result **with a header** as
+   comments from `pr_review_comments_v2` — and save the result **with a header** as
    `data/third_experiment/data_to_third_experiment.csv` (columns: real_human_author,
    pull_request_id, comments_by_human_maintainers).
 2. Run `run.py` - statistical tests (Kruskal–Wallis + two-sided Mann–Whitney, epsilon-squared and
@@ -302,9 +298,8 @@ Scripts are located in the `scripts/fourth_experiment/` directory.
 Scripts in `scripts/sensitivity_analysis/`. They run on files the main pipeline already produces
 (`data/prepare_data/`, `data/{first,second,third,fourth}_experiment/`), without needing raw AIDev access.
 
-- **`preprocessing_stability_check.py`** — compares clustering stability (Adjusted Rand Index between
-  clustering the full population and the population without the RF-imputed developers) for
-  `QuantileTransformer` and for `log1p`.
+- **`preprocessing_stability_check.py`** — compares clustering stability for `QuantileTransformer` and
+  for `log1p`.
 - **`clustering_sensitivity_checks.py`** — four checks: alternative k (2/4/5), repeated
   initializations (5 seeds), retained outliers (no Isolation Forest), and excluding the 3
   AIDev-derived indicators. Saves `data/sensitivity_analysis/exclude_aidev_indicators_labels.csv`.
