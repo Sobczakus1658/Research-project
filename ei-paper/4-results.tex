@@ -1,10 +1,10 @@
 \section{Results\label{sec:results}}
 
-The numbers below come from a full rerun of the pipeline described in Section~\ref{sec:method} against the AIDev Zenodo v3 release (DOI \texttt{10.5281/zenodo.16919272}), using the final 12-indicator activity profile, $\log(1+x)$ preprocessing, and the corrected RQ2/RQ3 data sources. They replace figures from two earlier, less reliable versions of the analysis: one with several data-source bugs, and a second, bug-fixed version whose clustering preprocessing (quantile transformation) was later found unstable (Section~\ref{sec:threats}) and replaced with $\log(1+x)$.
+The numbers below come from a full rerun of the pipeline described in Section~\ref{sec:method} against the AIDev Zenodo v3 release (DOI \texttt{10.5281/zenodo.16919272}), using the final 12-indicator activity profile, $\log(1+x)$ preprocessing, and a corrected RQ2 data source. They replace figures from two earlier, less reliable versions of the analysis: one with several data-source bugs, and a second, bug-fixed version whose clustering preprocessing (quantile transformation) was later found unstable (Section~\ref{sec:threats}) and replaced with $\log(1+x)$.
 
 \subsection{RQ1: How does a developer's experience correlate with the frequency of using AI agents?}
 
-For each of the three activity profiles, Table~\ref{tab:rq1-summary} reports the number of developers, and the mean, standard deviation, and median number of Agentic-PRs. The Kruskal--Wallis test showed a statistically significant difference in Agentic-PR counts across the three profiles ($H = 22762.32$, $p < 10^{-300}$, $\varepsilon^2 = 0.32$, bootstrap 95\% CI $[0.314, 0.323]$) -- a large effect by conventional standards, unlike the other three research questions.
+For each of the three activity profiles, Table~\ref{tab:rq1-summary} reports the number of developers, and the mean, standard deviation, and median number of Agentic-PRs. The Kruskal--Wallis test showed a statistically significant difference in Agentic-PR counts across the three profiles ($H = 22762.32$, $p < 10^{-300}$, $\varepsilon^2 = 0.32$, bootstrap 95\% CI $[0.314, 0.323]$) -- a large effect by conventional standards, unlike the other two research questions.
 
 All three pairwise Mann--Whitney comparisons (two-sided, Bonferroni-adjusted $\alpha = 0.0167$) were significant:
 \begin{itemize}
@@ -81,57 +81,16 @@ Table~\ref{tab:rq2-summary} reports the per-developer proportion of resolved Age
     \label{fig:summary-exp2}
 \end{figure}
 
-\subsection{RQ3: Do changes introduced by less active developers using AI require more corrections (measured by the number of comments) from other contributors?}
+\subsection{RQ3: How does the acceptance rate of Agentic-PRs compare to a human-authored baseline?}
 
-This analysis is restricted to AIDev-pop, following Section~\ref{sec:method}; when the author of a pull request is a bot, the linked issue's creator is treated as the human developer behind the contribution. Table~\ref{tab:rq3-summary} reports, for each activity profile, the mean number of non-bot external comments per Agentic-PR.
-
-The Kruskal--Wallis test found a significant difference between profiles ($H = 119.55$, $p < 10^{-25}$, $\varepsilon^2 = 0.009$, bootstrap 95\% CI $[0.005, 0.014]$) -- the smallest effect size of the four research questions. All three pairwise comparisons were significant under Bonferroni-adjusted $\alpha = 0.0167$:
-\begin{itemize}
-    \item \textbf{Junior vs.\ Mid}: $U = 5.096\times10^{4}$, $p = 5.3\times10^{-3}$, rank-biserial $r = -0.097$, 95\% CI $[-0.167, -0.025]$.
-    \item \textbf{Junior vs.\ Senior}: $U = 1.488\times10^{6}$, $p < 10^{-18}$, rank-biserial $r = -0.185$, 95\% CI $[-0.254, -0.123]$.
-    \item \textbf{Mid vs.\ Senior}: $U = 3.631\times10^{6}$, $p < 10^{-10}$, rank-biserial $r = -0.088$, 95\% CI $[-0.120, -0.055]$.
-\end{itemize}
-
-\textbf{External comment volume decreases monotonically with the composite activity ranking}: Junior receives the most comments per PR on average (0.50), followed by Mid (0.43) and Senior (0.27). As in the earlier version of this analysis, the median is 0.0 in every group -- most Agentic-PRs in AIDev-pop receive no external comments at all, so these mean differences are driven by a minority of PRs with several comments rather than a shift in the typical PR. The Junior group remains the smallest by a wide margin ($N=187$, against 497 for Mid and 13,434 for Senior), because AIDev-pop's high-star repositories contain comparatively few Junior-profile contributors; this imbalance, and the small effect size overall, mean the result should be read as suggestive rather than conclusive. A complete-case sensitivity check reverses this ordering entirely and removes its significance (Section~\ref{sec:threats}), making RQ3 the least robust of the four research questions.
-
-\begin{table}[tb]
-    \centering
-    \caption{RQ3: mean external comments per Agentic-PR by activity profile.}
-    \label{tab:rq3-summary}
-    \small
-    \begin{tabular}{lrrrr}
-        \toprule
-        Profile & $N$ & Mean & SD & Median \\
-        \midrule
-        Junior & 187    & 0.50 & 1.23 & 0.0 \\
-        Mid    & 497    & 0.43 & 1.51 & 0.0 \\
-        Senior & 13,434 & 0.27 & 1.64 & 0.0 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{third_experiment_table.png}
-    \label{fig:table-exp3}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{third_experiment.png}
-    \label{fig:boxplot-exp3}
-\end{figure}
-
-\subsection{RQ4: How does the acceptance rate of Agentic-PRs compare to a human-authored baseline?}
-
-As described in Section~\ref{sec:method}, this is a population-level comparison, not stratified by activity profile, so it is unaffected by the change in clustering preprocessing: the full Agentic-PR population (from RQ2, pooled across profiles) against the independent \texttt{human\_pull\_request} baseline. Table~\ref{tab:rq4-summary} reports the descriptive statistics for both groups.
+As described in Section~\ref{sec:method}, this is a population-level comparison, not stratified by activity profile, so it is unaffected by the change in clustering preprocessing: the full Agentic-PR population (from RQ2, pooled across profiles) against the independent \texttt{human\_pull\_request} baseline. Table~\ref{tab:rq3-summary} reports the descriptive statistics for both groups.
 
 A two-sided Mann--Whitney $U$ test found a statistically significant difference ($U = 6.795\times10^{7}$, $p < 10^{-8}$, rank-biserial $r = -0.054$, bootstrap 95\% CI $[-0.075, -0.034]$). \textbf{Agentic-PRs are accepted at a modestly higher rate (88.9\%) than the human-authored baseline (78.6\%)}, though the effect size is small and the human-authored baseline has a much wider spread (SD 38.8 vs.\ 26.8). This comparison is not developer-matched: the two populations overlap in only 351 of 2,515 human-baseline authors, so the difference reflects two different populations of contributors to two different (though both high-activity) parts of GitHub, not a within-person contrast of "the same developer with vs.\ without an agent."
 
 \begin{table}[tb]
     \centering
-    \caption{RQ4: pull-request acceptance rate (\%), Agentic-PRs vs.\ human-authored baseline.}
-    \label{tab:rq4-summary}
+    \caption{RQ3: pull-request acceptance rate (\%), Agentic-PRs vs.\ human-authored baseline.}
+    \label{tab:rq3-summary}
     \small
     \begin{tabular}{lrrrr}
         \toprule
@@ -146,11 +105,11 @@ A two-sided Mann--Whitney $U$ test found a statistically significant difference 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{fourth_experiment_summary_table.png}
-    \label{fig:table-exp4}
+    \label{fig:table-exp3}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{fourth_experiment_boxplot.png}
-    \label{fig:boxplot-exp4}
+    \label{fig:boxplot-exp3}
 \end{figure}

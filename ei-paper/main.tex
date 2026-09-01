@@ -46,7 +46,7 @@
 % Uncomment to include a bibliography of primary studies
 % \nociteS{*}
 
-\title{Developer Experience and AI-Agent Contributions: A Large-Scale Study of Usage, Acceptance, and Review Discussion}
+\title{Developer Experience and AI-Agent Contributions: A Large-Scale Study of Usage and Acceptance}
 
 \shortauthorshead{Michał Sobczak}
 
@@ -79,16 +79,16 @@
 AI coding agents are increasingly used in public repositories, yet their adoption and outcomes across developer experience levels remain unclear.
 \\
 \textbf{Objective}:
-We examine associations between developer experience and agent-use frequency, acceptance of agent-associated pull requests, and maintainer review discussion, and compare agent-authored acceptance against an independent human-authored baseline.
+We examine associations between developer experience and agent-use frequency and acceptance of agent-associated pull requests, and compare agent-authored acceptance against an independent human-authored baseline.
 \\
 \textbf{Method}:
 We analyzed the AIDev dataset from the MSR 2026 Mining Challenge: $932,791$ pull requests created by $72,189$ users in more than $116,000$ public repositories up to August 2025. The data were enriched with GitHub GraphQL activity metrics. After preprocessing ($\log(1+x)$ plus standardization) and 1\% outlier removal, $k$-means ($k=3$) grouped $71,467$ developers into activity-based Junior, Mid, and Senior clusters directly on the standardized 12-indicator profile; PCA was used only to visualize the dominant axes of variation, not as clustering input. A quantile-transformation preprocessing variant was tried first but found unstable under a complete-case sensitivity check (Adjusted Rand Index $0.46$ vs.\ $0.98$ for $\log(1+x)$) and was replaced. Differences were tested with Kruskal--Wallis and Bonferroni-corrected Mann--Whitney ($U$) tests.
 \\
 \textbf{Results}:
-Agent-use intensity was strongly non-monotonic ($\varepsilon^2=0.32$): the intermediate-activity Mid cluster submitted far more Agentic-PRs (median 12) than Junior (median 1) or the highest-activity Senior cluster (median 2). Acceptance rate was highest for Mid (91.8\%) and lowest for Senior (83.2\%), with Junior in between (90.2\%); all three pairwise contrasts were significant, though with a much smaller effect size ($\varepsilon^2=0.043$) than RQ1. Maintainer-comment counts decreased monotonically from Junior to Senior, with the smallest effect size of the four outcomes ($\varepsilon^2=0.009$); every group had a median of zero. Agentic-PRs were accepted at a modestly but significantly higher rate (88.9\%) than an independent human-authored baseline from comparably popular repositories (78.6\%).
+Agent-use intensity was strongly non-monotonic ($\varepsilon^2=0.32$): the intermediate-activity Mid cluster submitted far more Agentic-PRs (median 12) than Junior (median 1) or the highest-activity Senior cluster (median 2). Acceptance rate was highest for Mid (91.8\%) and lowest for Senior (83.2\%), with Junior in between (90.2\%); all three pairwise contrasts were significant, though with a much smaller effect size ($\varepsilon^2=0.043$) than RQ1. Agentic-PRs were accepted at a modestly but significantly higher rate (88.9\%) than an independent human-authored baseline from comparably popular repositories (78.6\%).
 \\
 \textbf{Conclusions}:
-Agent use and contribution outcomes did not follow a simple experience gradient: the highest-activity Senior cluster had neither the most Agentic-PRs nor the highest acceptance rate. Comment counts may reflect discussion or task complexity rather than corrections, and the activity-based clusters should not be equated with verified professional seniority.
+Agent use and contribution outcomes did not follow a simple experience gradient: the highest-activity Senior cluster had neither the most Agentic-PRs nor the highest acceptance rate, and the activity-based clusters should not be equated with verified professional seniority.
 \end{abstract}
 
 \maketitle 
