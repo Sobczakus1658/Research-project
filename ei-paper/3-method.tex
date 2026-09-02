@@ -1,13 +1,32 @@
 \section{Methodology}\label{sec:method}
 
-We conducted an observational repository-mining study. The workflow comprised four stages: selecting the AIDev challenge snapshot, enriching developer profiles with GitHub activity data, deriving activity-based experience profiles, and comparing agent use and pull-request outcomes across the resulting groups. The developer is the unit of analysis in all three research questions; for RQ3, pull-request-level comments are first aggregated within developers to avoid treating multiple contributions by the same person as independent observations.
+W pracy nie analizowaliśmy tylko kodu, ale również powiązane z nim metadane. Proces badawczy składał się z czterech etapów: wyboru wersji AIDev, wzbogacenia profili deweloperów o dane aktywności z GitHub, podziału użytkowników na grupy oraz porównania korzystania z agentów pomiędzy tymi grupami. Wyniki na poziomie pull requestów zostały zagregowane per programista, by uniknąć traktowania wielu wkładów tej samej osoby jako niezależnych obserwacji.
 
 \subsection{Data sources and sample construction}
 
-We used the AIDev snapshot released for the MSR 2026 Mining Challenge \cite{li2026aidev} (Zenodo release v3, DOI \texttt{10.5281/zenodo.16919272}). The full-scope part of the snapshot contains 932,791 Agentic-PRs produced by five coding agents in 116,211 public GitHub repositories up to 1 August 2025 and links them to 72,189 developers. It provides pull-request metadata, repository information, and developer identifiers. Richer interaction data -- issue-thread comments, formal reviews, inline review comments, commits, and related issues -- are collected by AIDev only for AIDev-pop, a curated subset of 33,596 Agentic-PRs from 2,807 repositories with more than 100 stars; there is no full-scope alternative for that interaction data to fall back to. We therefore use the full-scope data for RQ1, RQ2 and RQ4, and AIDev-pop for RQ3.
+Korzystamy z wydania Zenodo v3 zbioru AIDev (DOI \texttt{10.5281/zenodo.16919272}), opisanego w Sekcji 1.
 
-The activity visible in AIDev primarily describes developers in relation to agent-associated contributions. To obtain a broader activity profile, we enriched the developer records through the GitHub GraphQL API. Table~\ref{tab:profile-indicators} lists the 12 quantitative indicators used for clustering. The five-year indicators cover the five years preceding data collection. GitHub's restricted-contribution count was used as an indicator of private activity; because GitHub exposes only an aggregate selected by the account owner, this variable must not be interpreted as the exact number of private commits.
+Aktywność w AIDev opisuje deweloperów głównie w odniesieniu do wkładu powiązanego z agentami. Aby uzyskać szerszy zakres informacji, wzbogaciliśmy rekordy za pomocą GitHub GraphQL API. Tabela~\ref{tab:profile-indicators} przedstawia 12 ilościowych wskaźników użytych do klastrowania. Wskaźniki pięcioletnie obejmują pięć lat poprzedzających zbieranie danych. GitHub udostępnia tylko zagregowaną liczbę kontrybucji do prywatnych repozytoriów (nie tylko commitów, i tylko dla użytkowników, którzy zgodzili się to pokazywać) - nie należy tego interpretować jako dokładną liczbę prywatnych commitów. W procesie gromadzenia danych login uznawano za niedostępny - usunięty, przemianowany lub z jakiegoś innego powodu niedostępny - gdy API zwróciło status inny niż 200. Odpowiadający im deweloperzy to dokładnie ci, których wskaźniki później oszacowano metodą lasu losowego, opisaną poniżej. Zbieranie danych GraphQL przeprowadzono 6 maja 2026 roku. Należy zwrócić uwagę, że jest to około 9 miesięcy po okresie, którego dotyczą dane z AIDev, i mogły one ulec zmianie w tym czasie.
 
+Zbieranie danych GraphQL dało rekordy aktywności dla 70\,434 z 72\,189 deweloperów (97,57\%). Wskaźniki liczbowe pozostałych 1755 deweloperów oszacowano za pomocą modeli regresji lasu losowego \cite{breiman2001random}. Modele oceniono przy podziale 80/20 na zbiór treningowy i testowy, a przewidziane wartości liczbowe zaokrąglano do liczb całkowitych. Ich skuteczność predykcyjna była ograniczona - obserwowane wartości $R^2$ przedstawia Tabela~\ref{tab:r2-values}. Wartości te należy więc traktować jako przybliżone uzupełnienie brakujących profili, a nie wiarygodną rekonstrukcję ich aktywności.
+
+\begin{table}[tb]
+    \centering
+    \caption{Skuteczność predykcyjna ($R^2$) modeli imputacji lasem losowym.}
+    \label{tab:r2-values}
+    \small
+    \begin{tabular}{lr}
+        \toprule
+        \textbf{Wskaźnik} & \textbf{$R^2$} \\
+        \midrule
+        \texttt{collab\_breadth} & 0,098 \\
+        \texttt{5yr\_prs\_opened} & 0,088 \\
+        \texttt{5yr\_reviews\_given} & 0,020 \\
+        \texttt{5yr\_public\_commits} & $-0{,}073$ \\
+        \texttt{5yr\_private\_work} & $-0{,}272$ \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 \begin{table}[tb]
     \centering
     \caption{Indicators used to derive developer activity profiles.}
@@ -22,10 +41,10 @@ The activity visible in AIDev primarily describes developers in relation to agen
         Restricted activity & Restricted contributions during the preceding five years, when exposed by GitHub. \\
         Pull requests opened & Pull requests opened during the preceding five years. \\
         Reviews submitted & Pull-request reviews submitted during the preceding five years. \\
-        Account tenure & Time elapsed since creation of the GitHub account. \\
+        Account age & Time elapsed since creation of the GitHub account. \\
         Followers & Number of followers at the time of data collection. \\
-        Maximum stars & Largest stargazer count among repositories owned by the developer. \\
-        Maximum forks & Largest fork count among repositories owned by the developer. \\
+        Maximum stars & Highest star count among the developer's owned repositories. \\
+        Maximum forks & Highest fork count among the developer's owned repositories. \\
         Agentic-PR activity span & Days between the developer's first and last Agentic-PR. \\
         Agent diversity & Number of distinct coding agents used across the developer's Agentic-PRs. \\
         Agentic-PR repository breadth & Number of distinct repositories in which the developer has an Agentic-PR. \\
@@ -33,17 +52,13 @@ The activity visible in AIDev primarily describes developers in relation to agen
     \end{tabularx}
 \end{table}
 
-For each developer, activity indicators were collected via a single GitHub GraphQL API v4 query per login, retrieving \texttt{followers}, \texttt{repositoriesContributedTo}, and yearly \texttt{contributionsCollection} aggregates (public commits, restricted contributions, pull-request reviews, and pull requests opened) for each of the five years preceding collection; because these are scalar aggregate fields rather than paginated connections, no pagination was required. Queries were issued sequentially with a 0.2-second delay per login using Python and the \texttt{requests} library. A login was recorded as unavailable -- covering deleted, renamed, and otherwise inaccessible accounts -- whenever the API returned a non-200 status, an error payload, or a null user, and such logins were skipped without retry; the corresponding developers are exactly the ones whose indicators were later estimated via random-forest imputation, described next. The GraphQL collection was run on 6 May 2026, roughly nine months after the AIDev snapshot's own 1 August 2025 cutoff; profile-level indicators such as followers, account tenure, and the yearly contribution aggregates therefore reflect each account's state as of the later collection date rather than the state at the time of the developer's Agentic-PRs, and may include activity that occurred after the snapshot window.
-
-The GraphQL collection yielded activity records for 70,434 of the 72,189 developers (97.57\%). Numeric indicators for the remaining 1,755 developers were estimated using random-forest regression models \cite{breiman2001random}. The models were evaluated with an 80/20 train--test split, and predicted count values were rounded to integers. Their predictive performance was limited: the observed $R^2$ values were \texttt{collab\_breadth} 0.098, \texttt{5yr\_prs\_opened} 0.088, \texttt{5yr\_reviews\_given} 0.020, \texttt{5yr\_public\_commits} $-0.073$, and \texttt{5yr\_private\_work} $-0.272$. The imputed values should therefore be regarded as approximate coverage of missing profiles rather than reliable reconstructions of their activity.
-
 \subsection{Preprocessing and activity-profile construction}
 
-The indicators were strongly right-skewed and differed by several orders of magnitude. We applied a $\log(1+x)$ transformation and then standardized every feature to zero mean and unit variance. We next used Isolation Forest with the contamination parameter set to 1\% to remove the most anomalous profiles \cite{liu2008isolation}. This procedure removed 722 developers and left 71,467 profiles for the primary analysis.
+Wskaźniki były silnie prawoskośne i różniły się o kilka rzędów wielkości. Zastosowaliśmy transformację log(1+x), a następnie wystandaryzowaliśmy każdą cechę do średniej zero i wariancji jeden. Następnie użyliśmy Isolation Forest z parametrem kontaminacji ustawionym na 1\%, aby usunąć najbardziej skrajne przypadki \cite{liu2008isolation}. W wyniku tej procedury usunięto 722 programistów, pozostawiając 71\,467 profili do głównej analizy.
 
-A quantile transformation toward a normal marginal distribution was tried first in place of $\log(1+x)$, but a complete-case sensitivity check (Section~\ref{sec:threats}) found it unstable: clustering only the developers with real, non-imputed GraphQL data agreed with clustering the full population, on the same overlapping developers, at only Adjusted Rand Index $=0.46$. The same check with $\log(1+x)$ gave Adjusted Rand Index $=0.98$, so $\log(1+x)$ was adopted instead.
+Transformację kwantylową w kierunku rozkładu normalnego brzegowego wypróbowano najpierw zamiast log(1+x), ale kontrola wrażliwości typu complete-case (Sekcja 5) wykazała jej niestabilność. Klastrowanie na danych zawierających wyłącznie deweloperów z rzeczywistymi danymi GraphQL zgadzało się z klastrowaniem pełnej populacji jedynie przy Adjusted Rand Index = 0,46. Ta sama kontrola z log(1+x) dała Adjusted Rand Index = 0,98, więc pozostano przy tej drugiej metodzie.
 
-Principal component analysis (PCA) was computed on the transformed indicators to aid interpretation of the dominant axes of variation, not as a dimensionality-reduction step feeding the clustering algorithm \cite{jolliffe2016principal}: the first two principal components retain only approximately 50\% of the variance, so a 2-component projection would discard roughly half the signal. Clustering was therefore performed directly on the full 12-dimensional cleaned representation; PCA(2) is reported separately, purely to visualize which indicators drive the two dominant axes. As shown in Figure~\ref{fig:pca-loadings}, the first component loaded positively on the activity indicators and was interpreted as a general-activity axis. The second component contrasted agent-associated activity and public contribution volume (Agentic-PR activity span, Agentic-PR repository breadth, agent diversity, pull requests opened, and public commits) against general reputation and reviewing activity (followers, account tenure, maximum stars and forks, restricted activity, and reviews submitted).
+Analizę głównych składowych obliczono na przekształconych wskaźnikach, aby wspomóc interpretację dominujących osi zmienności, a nie jako etap redukcji wymiarowości zasilający algorytm klastrowania \cite{jolliffe2016principal}. Pierwsze dwie główne składowe zachowują jedynie około 50\% wariancji, więc projekcja do 2 wymiarów odrzucałaby mniej więcej połowę informacji. Dlatego klastrowanie przeprowadzono na pełnej, 12-wymiarowej, oczyszczonej reprezentacji; PCA(2) raportujemy osobno, wyłącznie w celu wizualizacji, które wskaźniki napędzają dwie dominujące osie. Jak pokazuje Rysunek~\ref{fig:pca-loadings}, pierwsza składowa ładuje się dodatnio na wskaźnikach aktywności i można ją interpretować jako oś ogólnej aktywności. Druga składowa przeciwstawia aktywność powiązaną z agentami i wielkość wkładu publicznego ogólnej rozpoznawalności oraz aktywności recenzenckiej.
 
 \begin{figure}[tb]
     \centering
