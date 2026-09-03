@@ -1,6 +1,6 @@
 \section{Methodology}\label{sec:method}
 
-W pracy nie analizowaliśmy tylko kodu, ale również powiązane z nim metadane. Proces badawczy składał się z czterech etapów: wyboru wersji AIDev, wzbogacenia profili deweloperów o dane aktywności z GitHub, podziału użytkowników na grupy oraz porównania korzystania z agentów pomiędzy tymi grupami. Wyniki na poziomie pull requestów zostały zagregowane per programista, by uniknąć traktowania wielu wkładów tej samej osoby jako niezależnych obserwacji.
+Analizowaliśmy nie tylko kod, ale również powiązane z nim metadane. Proces badawczy składał się z czterech etapów: wyboru wersji AIDev, wzbogacenia profili deweloperów o dane aktywności z GitHub, podziału użytkowników na grupy oraz porównania korzystania z agentów pomiędzy tymi grupami. Wyniki na poziomie pull requestów zostały zagregowane per programista, by uniknąć traktowania wielu wkładów tej samej osoby jako niezależnych obserwacji.
 
 \subsection{Data sources and sample construction}
 
@@ -29,25 +29,25 @@ Zbieranie danych GraphQL dało rekordy aktywności dla 70\,434 z 72\,189 dewelop
 \end{table}
 \begin{table}[tb]
     \centering
-    \caption{Indicators used to derive developer activity profiles.}
+    \caption{Wskaźniki użyte do wyznaczenia profili aktywności deweloperów.}
     \label{tab:profile-indicators}
     \small
     \begin{tabularx}{\linewidth}{@{}p{0.31\linewidth}X@{}}
         \toprule
-        \textbf{Indicator} & \textbf{Operationalization} \\
+        \textbf{Wskaźnik} & \textbf{Operacjonalizacja} \\
         \midrule
-        Collaboration breadth & Number of repositories to which the developer contributed. \\
-        Public commits & Public commit contributions during the preceding five years. \\
-        Restricted activity & Restricted contributions during the preceding five years, when exposed by GitHub. \\
-        Pull requests opened & Pull requests opened during the preceding five years. \\
-        Reviews submitted & Pull-request reviews submitted during the preceding five years. \\
-        Account age & Time elapsed since creation of the GitHub account. \\
-        Followers & Number of followers at the time of data collection. \\
-        Maximum stars & Highest star count among the developer's owned repositories. \\
-        Maximum forks & Highest fork count among the developer's owned repositories. \\
-        Agentic-PR activity span & Days between the developer's first and last Agentic-PR. \\
-        Agent diversity & Number of distinct coding agents used across the developer's Agentic-PRs. \\
-        Agentic-PR repository breadth & Number of distinct repositories in which the developer has an Agentic-PR. \\
+        Zakres współpracy & Liczba repozytoriów, do których deweloper wniósł wkład. \\
+        Publiczne commity & Publiczne kontrybucje typu commit w ciągu poprzedzających pięciu lat. \\
+        Aktywność zastrzeżona & Zastrzeżone kontrybucje w ciągu poprzedzających pięciu lat, gdy ujawnione przez GitHub. \\
+        Otwarte pull requesty & Pull requesty otwarte w ciągu poprzedzających pięciu lat. \\
+        Złożone recenzje & Recenzje pull requestów złożone w ciągu poprzedzających pięciu lat. \\
+        Staż konta & Czas, jaki upłynął od utworzenia konta GitHub. \\
+        Obserwujący & Liczba obserwujących w momencie zbierania danych. \\
+        Maksymalna liczba gwiazdek & Największa liczba gwiazdek wśród repozytoriów należących do dewelopera. \\
+        Maksymalna liczba forków & Największa liczba forków wśród repozytoriów należących do dewelopera. \\
+        Rozpiętość aktywności Agentic-PR & Liczba dni między pierwszym a ostatnim Agentic-PR dewelopera. \\
+        Różnorodność agentów & Liczba różnych agentów kodujących użytych w Agentic-PR dewelopera. \\
+        Zakres repozytoriów Agentic-PR & Liczba różnych repozytoriów, w których deweloper ma Agentic-PR. \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -58,50 +58,44 @@ Wskaźniki były silnie prawoskośne i różniły się o kilka rzędów wielkoś
 
 Transformację kwantylową w kierunku rozkładu normalnego brzegowego wypróbowano najpierw zamiast log(1+x), ale kontrola wrażliwości typu complete-case (Sekcja 5) wykazała jej niestabilność. Klastrowanie na danych zawierających wyłącznie deweloperów z rzeczywistymi danymi GraphQL zgadzało się z klastrowaniem pełnej populacji jedynie przy Adjusted Rand Index = 0,46. Ta sama kontrola z log(1+x) dała Adjusted Rand Index = 0,98, więc pozostano przy tej drugiej metodzie.
 
-Analizę głównych składowych obliczono na przekształconych wskaźnikach, aby wspomóc interpretację dominujących osi zmienności, a nie jako etap redukcji wymiarowości zasilający algorytm klastrowania \cite{jolliffe2016principal}. Pierwsze dwie główne składowe zachowują jedynie około 50\% wariancji, więc projekcja do 2 wymiarów odrzucałaby mniej więcej połowę informacji. Dlatego klastrowanie przeprowadzono na pełnej, 12-wymiarowej, oczyszczonej reprezentacji; PCA(2) raportujemy osobno, wyłącznie w celu wizualizacji, które wskaźniki napędzają dwie dominujące osie. Jak pokazuje Rysunek~\ref{fig:pca-loadings}, pierwsza składowa ładuje się dodatnio na wskaźnikach aktywności i można ją interpretować jako oś ogólnej aktywności. Druga składowa przeciwstawia aktywność powiązaną z agentami i wielkość wkładu publicznego ogólnej rozpoznawalności oraz aktywności recenzenckiej.
+Analizę głównych składowych obliczono na przekształconych wskaźnikach, aby wspomóc interpretację dominujących osi zmienności, a nie jako etap redukcji wymiarowości zasilający algorytm klastrowania \cite{jolliffe2016principal}. Pierwsze dwie główne składowe zachowują jedynie około 50\% wariancji, więc projekcja do 2 wymiarów odrzucałaby mniej więcej połowę informacji. Dlatego klastrowanie przeprowadziliśmy na pełnej, 12-wymiarowej, oczyszczonej reprezentacji; PCA(2) raportujemy osobno, wyłącznie w celu wizualizacji, które wskaźniki napędzają dwie dominujące osie. Jak pokazuje Rysunek~\ref{fig:pca-loadings}, pierwsza składowa ładuje się dodatnio na wskaźnikach aktywności i można ją interpretować jako oś ogólnej aktywności. Druga składowa przeciwstawia aktywność powiązaną z agentami i wielkość wkładu publicznego ogólnej rozpoznawalności oraz aktywności recenzenckiej.
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.92\linewidth]{pca_1.png}
     \vspace{0.5em}
     \includegraphics[width=0.92\linewidth]{pca_2.png}
-    \caption{Loadings of the activity indicators on the two dominant axes of variation (PC1, PC2), computed for interpretation only; PC1+PC2 retain approximately 50\% of the variance and are not used as the clustering input. PC1 primarily represents general GitHub activity, whereas PC2 contrasts agent-associated activity and public contribution volume against general reputation and reviewing activity.}
+    \caption{Ładunki wskaźników aktywności na dwóch dominujących osiach zmienności (PC1, PC2), obliczone wyłącznie w celach interpretacyjnych; PC1+PC2 zachowują około 50\% wariancji i nie są używane jako dane wejściowe do klastrowania. PC1 reprezentuje przede wszystkim ogólną aktywność na GitHub, podczas gdy PC2 przeciwstawia aktywność powiązaną z agentem i wielkość wkładu publicznego ogólnej rozpoznawalności i aktywności recenzenckiej.}
     \label{fig:pca-loadings}
 \end{figure}
 
-The full 12-dimensional cleaned representation was partitioned using $k$-means clustering \cite{lloyd1982least}. We examined candidate solutions for $k=2,\ldots,10$ using average silhouette width \cite{rousseeuw1987silhouettes} and the gap statistic \cite{tibshirani2001gap}, computed on that same 12-dimensional representation. Figure~\ref{fig:cluster-diagnostics} shows that $k=3$ is not the numerical optimum on either diagnostic: silhouette width is highest at $k=2$ (0.332), decreases at $k=3$ (0.294), rises slightly at $k=4$ (0.302), and then declines further for larger $k$; the gap statistic increases roughly monotonically across the whole range and is highest at $k=10$ (2.58). We nevertheless retained $k=3$ as a deliberately coarse and interpretable operationalization suited to comparisons among low-, intermediate-, and high-activity profiles. Thus, the analysis is conditional on this design choice and does not claim that three clusters constitute the intrinsic structure of the developer population.
+Pełną, 12-wymiarową, oczyszczoną reprezentację podzieliliśmy za pomocą klastrowania $k$-średnich \cite{lloyd1982least}. Zbadaliśmy również rezultaty dla różnych wartości $k=2,\ldots,10$ przy użyciu average silhouette width \cite{rousseeuw1987silhouettes} oraz gap statistic \cite{tibshirani2001gap}, obliczonych na tej samej 12-wymiarowej reprezentacji. Rysunek~\ref{fig:cluster-diagnostics} pokazuje, że $k=3$ nie jest optimum liczbowym według żadnej z tych statystyk. Mimo to zachowaliśmy $k=3$ jako celowo uproszczony i interpretowalny parametr, dopasowany do porównań pomiędzy profilami o niskiej, pośredniej i wysokiej aktywności. Analiza jest więc warunkowa względem tego wyboru i nie zakłada, że trzy klastry stanowią wewnętrzną strukturę populacji deweloperów.
 
 \begin{figure}[tb]
     \centering
     \includegraphics[width=0.90\linewidth]{silnouette.png}
     \vspace{0.5em}
     \includegraphics[width=0.90\linewidth]{gap_statistic.png}
-    \caption{Silhouette and gap-statistic diagnostics for candidate values of $k$, computed on the 12-dimensional clustering input. $k=3$ is not the numerical optimum on either diagnostic; it is retained as an interpretability-constrained design choice.}
+    \caption{Diagnostyki szerokości sylwetki i statystyki luki dla kandydujących wartości $k$, obliczone na 12-wymiarowych danych wejściowych klastrowania. $k=3$ nie jest optimum liczbowym według żadnej z diagnostyk; jest zachowane jako wybór projektowy podyktowany interpretowalnością.}
     \label{fig:cluster-diagnostics}
 \end{figure}
 
-The clusters were ordered by the summed value of the 12 standardized indicators and by the corresponding values of the original indicators. For readability, we refer to the low-, intermediate-, and high-activity profiles as \emph{Junior}, \emph{Mid}, and \emph{Senior}, respectively. They contain 44,854, 12,705, and 13,908 developers. These names denote relative \emph{overall} GitHub activity profiles within the analyzed population -- the composite of all 12 indicators, not any single one -- and are not verified job titles, career stages, or direct measurements of programming competence. This distinction matters concretely for RQ1: the Mid profile turns out to have the highest median Agentic-PR count of the three (Section~\ref{sec:results}), even though it ranks below Senior on the composite activity score that names the clusters, because that score also reflects indicators (followers, account tenure, repository stars and forks) on which Senior scores higher.
+Dla czytelności profile o niskiej, pośredniej i wysokiej aktywności nazywamy odpowiednio \emph{Junior}, \emph{Mid} i \emph{Senior}. Liczą one odpowiednio 44\,854, 12\,705 i 13\,908 deweloperów. Te etykiety nie są zweryfikowanymi stanowiskami zawodowymi, etapami kariery ani bezpośrednimi pomiarami kompetencji programistycznych. Ta rozbieżność ma konkretne znaczenie dla RQ1: profil Mid okazuje się mieć najwyższą medianę liczby Agentic-PR spośród trzech profili (Sekcja~\ref{sec:results}), mimo że w rankingu złożonego wyniku aktywności plasuje się niżej niż Senior, ponieważ ten wynik odzwierciedla też wskaźniki (obserwujący, staż konta, gwiazdki i forki repozytoriów), na których Senior wypada wyżej.
 
 \subsection{Outcome measures}
 
-The three outcome variables were not included among the clustering inputs.
+Zmienne wynikowe nie były uwzględnione wśród danych wejściowych klastrowania.
 
 \paragraph{RQ1: AI-agent use intensity.}
-For each developer, we counted the number of Agentic-PRs associated with that developer in the full AIDev snapshot. This variable measures observed contribution volume during the dataset window. It does not measure the proportion of the developer's total work performed with an agent or the general probability that the developer adopts AI tools.
+Dla każdego dewelopera policzyliśmy liczbę Agentic-PR powiązanych z tym deweloperem w pełnym zbiorze danych AIDev. Zmienna ta mierzy obserwowaną wielkość wkładu w oknie czasowym zbioru danych. Nie mierzy natomiast udziału całkowitej pracy dewelopera wykonanej z użyciem agenta ani ogólnego prawdopodobieństwa, że deweloper korzysta z narzędzi AI.
 
 \paragraph{RQ2: pull-request acceptance.}
-For each developer, we calculated the proportion of resolved Agentic-PRs that were merged. A pull request was classified as merged when its \texttt{merged\_at} field was non-null and as rejected when it was closed without being merged. Open pull requests were excluded from the denominator rather than treated as rejected. Developers without a resolved Agentic-PR were excluded from this analysis. This outcome concerns acceptance of pull requests, not correctness of individual generated lines or overall code quality.
+Dla każdego dewelopera obliczyliśmy proporcję rozstrzygniętych Agentic-PR, które zostały scalone. Pull request klasyfikowano jako scalony, gdy jego pole \texttt{merged\_at} było niepuste, a jako odrzucony, gdy został zamknięty bez scalenia. Otwarte pull requesty wykluczono z mianownika, zamiast traktować je jako odrzucone. Deweloperów bez rozstrzygniętego Agentic-PR wykluczono z tej analizy. Ten wynik dotyczy akceptacji pull requestów, a nie poprawności poszczególnych wygenerowanych linii kodu ani ogólnej jego jakości.
 
-\paragraph{RQ3: review-discussion volume.}
-Detailed discussion artifacts are not available in the full-scope tables, so this analysis is restricted to AIDev-pop. We use the \texttt{pr\_comments} table, which contains issue-thread comments associated with pull requests. Formal review records and inline review comments are not included in the primary measure. When a bot-authored pull request is linked to an issue, the issue creator is used as the human developer associated with the contribution, following the mapping rule used in the original analysis. Pull requests that cannot be mapped to one of the activity profiles are excluded.
-
-For each retained Agentic-PR, we count non-bot comments written by an account other than the mapped developer; pull requests without a matching comment record receive a count of zero. The public AIDev fields do not provide a reproducible maintainer-role indicator for these commenters. We therefore interpret the outcome as \emph{external human discussion}, not as comments verified to have been written by maintainers. We aggregate the pull-request counts within each developer by computing the mean number of external comments per Agentic-PR. This avoids treating multiple contributions by the same developer as independent observations. The resulting measure is a proxy for visible discussion volume, not a direct count of requested corrections, review effort, defects, or code quality.
-
-\paragraph{RQ4: Agentic-PR acceptance vs.\ a human-authored baseline.}
-AIDev separately provides \texttt{human\_pull\_request}, a baseline sample of human-authored pull requests (i.e.\ without agent involvement) drawn from repositories with more than 500 stars. We initially considered stratifying this comparison by the same Junior/Mid/Senior profiles used in RQ1--RQ3, but the two author populations overlap only marginally: of the 2,515 distinct authors in \texttt{human\_pull\_request}, only 351 also appear among the 72,189 developers linked to Agentic-PRs. RQ4 therefore compares two independent populations rather than matched individuals: the acceptance rate of all Agentic-PRs (as in RQ2, pooled across activity profiles) against the acceptance rate of \texttt{human\_pull\_request}, using the same merged/rejected/open-PR handling as RQ2. This is a population-level, not a developer-matched, comparison, and the human-authored baseline is itself restricted to a narrower, higher-star repository sample than the full Agentic-PR population.
+\paragraph{RQ3: Agentic-PR acceptance vs.\ a human-authored baseline.}
+AIDev osobno udostępnia tabelę \texttt{human\_pull\_request} - bazową próbę pull requestów autorstwa ludzi (bez udziału agenta), pochodzącą z repozytoriów z ponad 500 gwiazdkami. Rozważaliśmy początkowo programistów znajdujących się w obu tych grupach, ale okazało się, że jedynie 351 z 2515 odrębnych autorów w \texttt{human\_pull\_request} znalazło się jednocześnie wśród 72\,189 deweloperów powiązanych z Agentic-PR. Stąd decyzja, że w RQ3 porównujemy dwie niezależne populacje: wskaźnik akceptacji wszystkich Agentic-PR, zsumowany po profilach aktywności, w porównaniu do wskaźnika akceptacji \texttt{human\_pull\_request}, przy użyciu tej samej klasyfikacji scalony/odrzucony/otwarty co w RQ2. Jest to porównanie na poziomie populacji, a nie dopasowane na poziomie deweloperów, a bazowa populacja jest sama w sobie ograniczona do węższej próby repozytoriów niż pełna populacja Agentic-PR.
 
 \subsection{Statistical analysis}
+Rozkłady zmiennych wynikowych nie dało się prosto porównać z popularnymi i znanymi rozkładami, a miary oparte na liczności zawierały wiele remisów oraz zer. Dla RQ1-RQ2, z których każde porównuje trzy profile aktywności, najpierw stosujemy test Kruskala-Wallisa, aby ocenić, czy rozkłady wyniku różnią się pomiędzy trzema grupami. Istotny wynik testu ogólnego jest uzupełniany dwustronnymi parami testów Manna-Whitneya $U$, przy czym trzy porównania parami dla każdego pytania badawczego korygujemy poprawką Bonferroniego, przy poziomie istotności $\alpha=0,05$. RQ3 porównuje tylko dwie niezależne grupy, więc stosujemy pojedynczy test Manna-Whitneya $U$, bez etapu testu ogólnego Kruskala-Wallisa i bez poprawki Bonferroniego.
 
-The outcome distributions were strongly non-normal, and the count-based measures contained many ties and zeros. For RQ1--RQ3, each comparing three activity profiles, we first use the Kruskal--Wallis test to assess whether the outcome distributions differ across the three groups. A significant omnibus result is followed by two-sided pairwise Mann--Whitney $U$ tests, with the three pairwise comparisons per research question adjusted using the Bonferroni correction, at a family-wise significance level of $\alpha=0.05$. RQ4 compares only two independent groups (Agentic-PRs vs.\ the human-authored baseline), so a single two-sided Mann--Whitney $U$ test is used directly, without a Kruskal--Wallis omnibus step or a Bonferroni correction.
-
-For every group, we report the sample size, mean, standard deviation, and median. Because the large samples make very small differences statistically detectable, we accompany $p$-values with effect sizes: epsilon-squared for the Kruskal--Wallis test and rank-biserial correlation for pairwise comparisons. Each effect size is reported with a 95\% confidence interval obtained by nonparametric bootstrap: for epsilon-squared, we resample each group independently with replacement, recompute the Kruskal--Wallis statistic, and take the 2.5th and 97.5th percentiles over 2,000 resamples; the same procedure, applied to the two groups being compared, is used for each pairwise rank-biserial correlation. All analyses concern associations between activity-based profiles and observed outcomes; the observational design does not support causal claims about the effect of professional experience.
+Dla każdej grupy zanotowaliśmy liczność próby, średnią, odchylenie standardowe i medianę. Dodatkowo uzupełniamy wartości $p$ wielkościami efektu: epsilon-kwadrat dla testu Kruskala-Wallisa oraz korelacją rangowo-biseryjną dla porównań parami. Każdą wielkość efektu raportujemy wraz z 95\% przedziałem ufności uzyskanym metodą nieparametrycznego bootstrapu: dla epsilon-kwadrat losujemy ponownie każdą grupę niezależnie ze zwracaniem, przeliczamy statystykę Kruskala-Wallisa i bierzemy 2,5. oraz 97,5. percentyl z 2000 powtórzeń losowania. Ta sama procedura, zastosowana do dwóch porównywanych grup, jest używana dla każdej korelacji rangowo-biseryjnej w porównaniach parami. Wszystkie analizy dotyczą związków pomiędzy profilami opartymi na aktywności a obserwowanymi wynikami.
