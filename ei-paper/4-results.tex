@@ -1,19 +1,19 @@
 \section{Results\label{sec:results}}
-
-The numbers below come from a full rerun of the pipeline described in Section~\ref{sec:method} against the AIDev Zenodo v3 release (DOI \texttt{10.5281/zenodo.16919272}), using the final 12-indicator activity profile, $\log(1+x)$ preprocessing, and the corrected RQ2/RQ3 data sources. They replace figures from two earlier, less reliable versions of the analysis: one with several data-source bugs, and a second, bug-fixed version whose clustering preprocessing (quantile transformation) was later found unstable (Section~\ref{sec:threats}) and replaced with $\log(1+x)$.
+Poniższe liczby zostały wygenerowane za pomocą metodyki opisanej w Sekcji 3 oraz skryptów dostarczonych w repozytorium. Korzystają z wydania AIDev v3 (DOI \texttt{10.5281/zenodo.16919272}), z użyciem finalnego 12-wskaźnikowego profilu aktywności, preprocessingu log(1+x).
 
 \subsection{RQ1: How does a developer's experience correlate with the frequency of using AI agents?}
+Dla każdej z trzech grup Tabela~\ref{tab:rq1-summary} przedstawia liczbę deweloperów, średnią, odchylenie standardowe i medianę liczby Agentic-PR. Test Kruskala-Wallisa wykazał statystycznie istotną różnicę w liczbie Agentic-PR pomiędzy trzema grupami ($H = 22762{,}32$, $p < 10^{-300}$, $\varepsilon^2 = 0{,}32$, 95\% CI bootstrap $[0{,}314, 0{,}323]$) - duży efekt według konwencjonalnych standardów, w przeciwieństwie do pozostałych dwóch pytań badawczych.
 
-For each of the three activity profiles, Table~\ref{tab:rq1-summary} reports the number of developers, and the mean, standard deviation, and median number of Agentic-PRs. The Kruskal--Wallis test showed a statistically significant difference in Agentic-PR counts across the three profiles ($H = 22762.32$, $p < 10^{-300}$, $\varepsilon^2 = 0.32$, bootstrap 95\% CI $[0.314, 0.323]$) -- a large effect by conventional standards, unlike the other three research questions.
-
-All three pairwise Mann--Whitney comparisons (two-sided, Bonferroni-adjusted $\alpha = 0.0167$) were significant:
+Wszystkie trzy porównania parami testem Manna-Whitneya (dwustronne, poprawka Bonferroniego, $\alpha = 0{,}0167$) były istotne:
 \begin{itemize}
     \item \textbf{Senior vs.\ Junior}: $U = 3.665\times10^{8}$, $p < 10^{-253}$, rank-biserial $r = -0.175$, 95\% CI $[-0.186, -0.165]$.
     \item \textbf{Senior vs.\ Mid}: $U = 2.626\times10^{7}$, $p < 10^{-300}$, rank-biserial $r = 0.703$, 95\% CI $[0.694, 0.711]$.
     \item \textbf{Mid vs.\ Junior}: $U = 5.199\times10^{8}$, $p < 10^{-300}$, rank-biserial $r = -0.825$, 95\% CI $[-0.829, -0.820]$.
 \end{itemize}
 
-\textbf{The result is not monotonic in activity level.} The \emph{Mid} profile has by far the highest Agentic-PR volume (mean 42.1, median 12), well above both \emph{Senior} (mean 7.9, median 2) and \emph{Junior} (mean 3.6, median 1); Senior in turn has a modestly but significantly higher volume than Junior. Recall that the profiles are ranked by a composite of all 12 indicators, not by Agentic-PR count itself (Section~\ref{sec:method}): Senior outranks Mid on that composite because of indicators such as followers, account tenure, and repository stars/forks, even though Mid submits far more Agentic-PRs. Two of the three pairwise effect sizes are large (Senior-vs-Mid $r=0.70$, Mid-vs-Junior $r=-0.82$), consistent with the large omnibus effect size; only the Senior-vs-Junior contrast is modest ($r=-0.18$).
+\textbf{Wynik nie jest monotoniczny względem poziomu aktywności.}
+
+Profil \emph{Mid} zdecydowanie najczęściej korzystał z Agentic-PR (średnia 42,1, mediana 12), znacznie powyżej pozostałych grup - \emph{Junior} (średnia 3,6 i mediana 1) oraz \emph{Senior} (7,9 i mediana 2). Senior z kolei ma umiarkowanie, ale istotnie statystycznie wyższą liczbę Agentic-PR niż Junior. Przypomnijmy, że profile są uszeregowane według złożonego wyniku wszystkich 12 wskaźników, a nie samej liczby Agentic-PR (Sekcja 3): Senior wyprzedza Mid w tym złożonym wyniku dzięki wskaźnikom takim jak liczba obserwujących, staż konta oraz gwiazdki i forki repozytoriów, mimo że Mid zgłasza znacznie więcej Agentic-PR. Dwie z trzech wielkości efektu w porównaniach parami są duże (Senior vs Mid $r = 0{,}70$, Mid vs Junior $r = -0{,}82$), spójne z dużym efektem ogólnym; jedynie kontrast Senior vs Junior jest umiarkowany ($r = -0{,}18$).
 
 \begin{table}[tb]
     \centering
@@ -45,14 +45,16 @@ All three pairwise Mann--Whitney comparisons (two-sided, Bonferroni-adjusted $\a
 
 \subsection{RQ2: Does human experience translate into a higher acceptance rate of agent-generated code?}
 
-Table~\ref{tab:rq2-summary} reports the per-developer proportion of resolved Agentic-PRs that were merged. The Kruskal--Wallis test confirmed a significant difference across profiles ($H = 2380.03$, $p < 10^{-300}$, $\varepsilon^2 = 0.043$, bootstrap 95\% CI $[0.039, 0.046]$). All three pairwise comparisons were significant:
+Tabela~\ref{tab:rq2-summary} przedstawia proporcję rozstrzygniętych Agentic-PR scalonych, w rozbiciu na dewelopera. Test Kruskala-Wallisa potwierdził istotną różnicę pomiędzy profilami ($H = 2380{,}03$, $p < 10^{-300}$, $\varepsilon^2 = 0{,}043$, 95\% CI bootstrap $[0{,}039, 0{,}046]$). Wszystkie trzy porównania parami były istotne:
 \begin{itemize}
     \item \textbf{Senior vs.\ Junior}: $U = 1.583\times10^{8}$, $p < 10^{-259}$, rank-biserial $r = 0.151$, 95\% CI $[0.142, 0.160]$.
     \item \textbf{Senior vs.\ Mid}: $U = 7.458\times10^{7}$, $p < 10^{-3}$, rank-biserial $r = -0.022$, 95\% CI $[-0.035, -0.009]$.
     \item \textbf{Mid vs.\ Junior}: $U = 1.537\times10^{8}$, $p < 10^{-300}$, rank-biserial $r = 0.210$, 95\% CI $[0.200, 0.219]$.
 \end{itemize}
 
-\textbf{Mid has the highest mean acceptance rate (91.8\%), narrowly ahead of Junior (90.2\%), with Senior clearly lowest (83.2\%).} The Senior-vs-Mid effect is statistically significant but negligible in size ($r=-0.02$); the more substantial contrasts are Senior's lower acceptance against both other profiles. This is not the strict monotonic decrease reported in an earlier version of this analysis under quantile-transform-based clustering, but the qualitative conclusion that motivated that revision is unchanged: \emph{higher composite GitHub activity is not associated with a higher agent-PR acceptance rate} -- the highest-activity profile (Senior) has the lowest acceptance in both versions of the analysis.
+\textbf{Mid ma najwyższy średni wskaźnik akceptacji (91,8\%), nieznacznie wyprzedzając Junior (90,2\%), przy zdecydowanie najniższym wyniku dla Senior (83,2\%).}
+
+Efekt Senior-Mid jest istotny statystycznie, ale znikomy pod względem wielkości ($r = -0{,}02$); bardziej znaczące są kontrasty niższej akceptacji Senior względem obu pozostałych profili. Nie jest to ścisły, monotoniczny spadek raportowany we wcześniejszej wersji tej analizy, opartej na klastrowaniu z wykorzystaniem transformacji kwantylowej (tej niestabilnej metody preprocessingu, którą później zastąpiono log(1+x) - patrz Sekcja 3), ale wniosek jakościowy, pozostaje niezmieniony: wyższa złożoność aktywności na GitHubie nie wiąże się z wyższym wskaźnikiem akceptacji Agentic-PR - profil o najwyższej aktywności ma najniższą akceptację w obu wersjach analizy.
 
 \begin{table}[tb]
     \centering
@@ -81,57 +83,15 @@ Table~\ref{tab:rq2-summary} reports the per-developer proportion of resolved Age
     \label{fig:summary-exp2}
 \end{figure}
 
-\subsection{RQ3: Do changes introduced by less active developers using AI require more corrections (measured by the number of comments) from other contributors?}
+\subsection{RQ3: How does the acceptance rate of Agentic-PRs compare to a human-authored baseline?}
+Jak opisano w Sekcji 3, jest to porównanie na poziomie populacji, nie według profili aktywności: pełna populacja Agentic-PR (z RQ2, zsumowana po profilach) w porównaniu do niezależnej bazy \texttt{human\_pull\_request} - więc nie jest ono dotknięte zmianą preprocessingu klastrowania. Tabela~\ref{tab:rq3-summary} przedstawia statystyki opisowe dla obu grup.
 
-This analysis is restricted to AIDev-pop, following Section~\ref{sec:method}; when the author of a pull request is a bot, the linked issue's creator is treated as the human developer behind the contribution. Table~\ref{tab:rq3-summary} reports, for each activity profile, the mean number of non-bot external comments per Agentic-PR.
-
-The Kruskal--Wallis test found a significant difference between profiles ($H = 119.55$, $p < 10^{-25}$, $\varepsilon^2 = 0.009$, bootstrap 95\% CI $[0.005, 0.014]$) -- the smallest effect size of the four research questions. All three pairwise comparisons were significant under Bonferroni-adjusted $\alpha = 0.0167$:
-\begin{itemize}
-    \item \textbf{Junior vs.\ Mid}: $U = 5.096\times10^{4}$, $p = 5.3\times10^{-3}$, rank-biserial $r = -0.097$, 95\% CI $[-0.167, -0.025]$.
-    \item \textbf{Junior vs.\ Senior}: $U = 1.488\times10^{6}$, $p < 10^{-18}$, rank-biserial $r = -0.185$, 95\% CI $[-0.254, -0.123]$.
-    \item \textbf{Mid vs.\ Senior}: $U = 3.631\times10^{6}$, $p < 10^{-10}$, rank-biserial $r = -0.088$, 95\% CI $[-0.120, -0.055]$.
-\end{itemize}
-
-\textbf{External comment volume decreases monotonically with the composite activity ranking}: Junior receives the most comments per PR on average (0.50), followed by Mid (0.43) and Senior (0.27). As in the earlier version of this analysis, the median is 0.0 in every group -- most Agentic-PRs in AIDev-pop receive no external comments at all, so these mean differences are driven by a minority of PRs with several comments rather than a shift in the typical PR. The Junior group remains the smallest by a wide margin ($N=187$, against 497 for Mid and 13,434 for Senior), because AIDev-pop's high-star repositories contain comparatively few Junior-profile contributors; this imbalance, and the small effect size overall, mean the result should be read as suggestive rather than conclusive. A complete-case sensitivity check reverses this ordering entirely and removes its significance (Section~\ref{sec:threats}), making RQ3 the least robust of the four research questions.
+Dwustronny test Manna-Whitneya $U$ wykazał statystycznie istotną różnicę ($U = 6{,}795 \times 10^{7}$, $p < 10^{-8}$, korelacja rangowo-biseryjna $r = -0{,}054$, 95\% CI bootstrap $[-0{,}075, -0{,}034]$). Agentic-PR są akceptowane nieco częściej (88,9\%) niż bazowa populacja ludzka (78,6\%), choć wielkość efektu jest niewielka, a bazowa populacja ludzka ma znacznie większy rozrzut (SD 38,8 wobec 26,84). Porównanie to nie jest dopasowane na poziomie dewelopera: obie populacje pokrywają się jedynie w 351 z 2515 autorów bazy ludzkiej, więc różnica odzwierciedla dwie różne populacje kontrybutorów w dwóch różnych (choć obu wysoce aktywnych) częściach GitHub, a nie porównanie wewnątrzosobowe - tego samego dewelopera zarówno z użyciem agenta, jak i bez jego udziału.
 
 \begin{table}[tb]
     \centering
-    \caption{RQ3: mean external comments per Agentic-PR by activity profile.}
+    \caption{RQ3: pull-request acceptance rate (\%), Agentic-PRs vs.\ human-authored baseline.}
     \label{tab:rq3-summary}
-    \small
-    \begin{tabular}{lrrrr}
-        \toprule
-        Profile & $N$ & Mean & SD & Median \\
-        \midrule
-        Junior & 187    & 0.50 & 1.23 & 0.0 \\
-        Mid    & 497    & 0.43 & 1.51 & 0.0 \\
-        Senior & 13,434 & 0.27 & 1.64 & 0.0 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{third_experiment_table.png}
-    \label{fig:table-exp3}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{third_experiment.png}
-    \label{fig:boxplot-exp3}
-\end{figure}
-
-\subsection{RQ4: How does the acceptance rate of Agentic-PRs compare to a human-authored baseline?}
-
-As described in Section~\ref{sec:method}, this is a population-level comparison, not stratified by activity profile, so it is unaffected by the change in clustering preprocessing: the full Agentic-PR population (from RQ2, pooled across profiles) against the independent \texttt{human\_pull\_request} baseline. Table~\ref{tab:rq4-summary} reports the descriptive statistics for both groups.
-
-A two-sided Mann--Whitney $U$ test found a statistically significant difference ($U = 6.795\times10^{7}$, $p < 10^{-8}$, rank-biserial $r = -0.054$, bootstrap 95\% CI $[-0.075, -0.034]$). \textbf{Agentic-PRs are accepted at a modestly higher rate (88.9\%) than the human-authored baseline (78.6\%)}, though the effect size is small and the human-authored baseline has a much wider spread (SD 38.8 vs.\ 26.8). This comparison is not developer-matched: the two populations overlap in only 351 of 2,515 human-baseline authors, so the difference reflects two different populations of contributors to two different (though both high-activity) parts of GitHub, not a within-person contrast of "the same developer with vs.\ without an agent."
-
-\begin{table}[tb]
-    \centering
-    \caption{RQ4: pull-request acceptance rate (\%), Agentic-PRs vs.\ human-authored baseline.}
-    \label{tab:rq4-summary}
     \small
     \begin{tabular}{lrrrr}
         \toprule
@@ -146,11 +106,11 @@ A two-sided Mann--Whitney $U$ test found a statistically significant difference 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\linewidth]{fourth_experiment_summary_table.png}
-    \label{fig:table-exp4}
+    \label{fig:table-exp3}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.85\linewidth]{fourth_experiment_boxplot.png}
-    \label{fig:boxplot-exp4}
+    \label{fig:boxplot-exp3}
 \end{figure}
