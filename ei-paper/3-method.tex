@@ -69,7 +69,7 @@ Analizę głównych składowych obliczono na przekształconych wskaźnikach, aby
     \label{fig:pca-loadings}
 \end{figure}
 
-Pełną, 12-wymiarową, oczyszczoną reprezentację podzieliliśmy za pomocą klastrowania $k$-średnich \cite{lloyd1982least}. Zbadaliśmy również rezultaty dla różnych wartości $k=2,\ldots,10$ przy użyciu average silhouette width \cite{rousseeuw1987silhouettes} oraz gap statistic \cite{tibshirani2001gap}, obliczonych na tej samej 12-wymiarowej reprezentacji. Rysunek~\ref{fig:cluster-diagnostics} pokazuje, że $k=3$ nie jest optimum liczbowym według żadnej z tych statystyk. Mimo to zachowaliśmy $k=3$ jako celowo uproszczony i interpretowalny parametr, dopasowany do porównań pomiędzy profilami o niskiej, pośredniej i wysokiej aktywności. Analiza jest więc warunkowa względem tego wyboru i nie zakłada, że trzy klastry stanowią wewnętrzną strukturę populacji deweloperów.
+Pełną, 12-wymiarową, oczyszczoną reprezentację podzieliliśmy za pomocą klastrowania $k$-średnich \cite{lloyd1982least}. Zbadaliśmy również rezultaty dla różnych wartości $k=2,\ldots,10$ przy użyciu average silhouette width \cite{rousseeuw1987silhouettes} oraz gap statistic \cite{tibshirani2001gap}, obliczonych na tej samej 12-wymiarowej reprezentacji. Rysunek~\ref{fig:cluster-diagnostics} pokazuje, że $k=3$ nie jest optimum liczbowym według żadnej z tych statystyk. Mimo to zachowaliśmy tę wartość jako celowo uproszczony i interpretowalny parametr, dopasowany do porównań pomiędzy profilami o niskiej, pośredniej i wysokiej aktywności. Analiza jest więc warunkowa względem tego wyboru i nie zakłada, że trzy klastry stanowią wewnętrzną strukturę populacji deweloperów.
 
 \begin{figure}[H]
     \centering

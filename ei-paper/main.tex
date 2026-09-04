@@ -45,10 +45,10 @@
 
 \shortauthorshead{Michał Sobczak}
 
-\eIsubmitted{1 Dec. 2025} 
-\eIrevised{10 Dec. 2025} 
-\eIaccepted{10 Dec. 2025}
-\eIpublished{11 Dec. 2024} 
+\eIsubmitted{}
+\eIrevised{}
+\eIaccepted{}
+\eIpublished{}
 
 \EIauthorI
    {Michał}
@@ -79,7 +79,7 @@ W obecnych czasach można zauważyć coraz większe i częstsze wykorzystywanie 
 Zbadano zależność pomiędzy doświadczeniem programisty a częstotliwością korzystania z pomocy AI oraz akceptacją pull requestów powiązanych z agentami, w tym również porównano akceptację wkładu agentowego z niezależną, bazową populacją ludzką.
 \\
 \textbf{Method}:
-W pracy przeanalizowano zbiór danych AIDev z MSR 2026 Mining Challenge: 932\,791 pull requestów stworzonych przez 72\,189 użytkowników w ponad 116\,000 publicznych repozytoriów do sierpnia 2025 roku. Dane zostały wzbogacone o metryki aktywności GitHub GraphQL. Po preprocessingu (log(1+x) plus standaryzacja) i usunięciu 1\% wartości odstających pozostało 71\,467 deweloperów. Do klasteryzacji wykorzystano algorytm k-means dla k=3 na wystandaryzowanym 12-wymiarowym profilu, dzieląc deweloperów na profile aktywności nazwane Junior, Mid i Senior. Dodatkowo, w celu wizualizacji najbardziej dominujących cech, wykorzystano PCA. Wstępnie w procesie preprocessingu wykorzystano transformację kwantylową, lecz metoda ta okazała się niestabilna w kontroli wrażliwości complete-case (Adjusted Rand Index wyniósł 0,46, podczas gdy dla log(1+x) wyniósł aż 0,98). Różnice w liczbie Agentic-PR oraz wskaźniku akceptacji między grupami testowano testem Kruskala-Wallisa oraz testami Manna-Whitneya z poprawką Bonferroniego.
+W pracy przeanalizowano zbiór danych AIDev z MSR 2026 Mining Challenge: 932\,791 pull requestów stworzonych przez 72\,189 użytkowników w ponad 116\,000 publicznych repozytoriów do sierpnia 2025 roku. Dane zostały wzbogacone o metryki aktywności GitHub GraphQL. Po preprocessingu (log(1+x) plus standaryzacja) i usunięciu 1\% wartości odstających pozostało 71\,467 deweloperów. Do klasteryzacji wykorzystano algorytm k-means dla k=3 na wystandaryzowanym 12-wymiarowej statystyce, dzieląc deweloperów na profile aktywności nazwane Junior, Mid i Senior. Dodatkowo, w celu wizualizacji najbardziej dominujących cech, wykorzystano PCA. Wstępnie w procesie preprocessingu wykorzystano transformację kwantylową, lecz metoda ta okazała się niestabilna w kontroli wrażliwości complete-case (Adjusted Rand Index wyniósł 0,46, podczas gdy dla log(1+x) wyniósł aż 0,98). Różnice w liczbie Agentic-PR oraz wskaźniku akceptacji między grupami testowano testem Kruskala-Wallisa oraz testami Manna-Whitneya z poprawką Bonferroniego.
 \\
 \textbf{Results}:
 Intensywność korzystania z agenta była znacząco niemonotoniczna ($\varepsilon^2=0{,}32$). Klaster o pośredniej aktywności, nazwany Mid, cechował się największą aktywnością użycia agentów (mediana 12) niż Junior (mediana 1) czy klaster o najwyższej aktywności (mediana 2). Wskaźnik akceptacji był najwyższy dla Mid (91,8\%) i najniższy dla Senior (83,2\%), z Junior pośrodku (90,2\%); wszystkie trzy porównania parami były istotne statystycznie, choć z dużo mniejszą wielkością efektu ($\varepsilon^2=0{,}043$) niż dla intensywności korzystania z agenta. Agentic-PR były akceptowane na nieco, ale istotnie statystycznie wyższym poziomie (88,9\%) niż niezależna bazowa populacja ludzka (78,6\%).
@@ -97,10 +97,12 @@ Korzystanie z agenta i wyniki wkładu nie podążały za prostym gradientem doś
 \input{5-threats}
 \input{6-conclusions}
 
+\section*{Podziękowania}
+Podziękowania dla Krzysztofa Stencla, promotora tej pracy, za recenzję oraz cenne sugestie, które przyczyniły się do jej ostatecznego kształtu.
+
 \setbiblabelwidth{1000}
 \bibliographystyle{IEEEtran_for_EI} 
 \bibliography{bib}
 
-\label{LastPage}
 \end{document}
 \endinput
