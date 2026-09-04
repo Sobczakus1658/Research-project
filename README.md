@@ -2,7 +2,7 @@
 
 ## 🇵🇱 Wersja polska
 
-Plik zawiera opis odtworzenia wyników oraz kolejność uruchamiania skryptów wraz z opisem przetwarzanych danych. Analiza wyników znajduje się w pliku: [raport.pdf](raport.pdf)
+Plik zawiera opis odtworzenia wyników oraz kolejność uruchamiania skryptów wraz z opisem przetwarzanych danych.
 
 ### **Krok 0: Pobranie i podział danych wejściowych**
 1. Pobierz dane z bazy **AIDEV** — Zenodo, wydanie v3, DOI `10.5281/zenodo.16919272`
@@ -159,7 +159,6 @@ Wyniki tych skryptów są zacytowane w `ei-paper/5-threats.tex` i `ei-paper/6-co
 ## 🇬🇧 English version
 
 This file describes how to reproduce the results, the order in which to run the scripts, and the data being processed.
-The analysis of the results is in the file: [report.pdf](report.pdf)
 
 ### **Step 0: Downloading and splitting the input data**
 1. Download the data from the **AIDEV** database — Zenodo, release v3, DOI `10.5281/zenodo.16919272`

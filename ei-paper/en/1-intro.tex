@@ -1,0 +1,29 @@
+\section{Introduction}\label{sec:introduction}
+
+Large language models have changed the way software is built - at first they were used to generate small pieces of code without knowing the wider context, but now they can write a large part of the software, since they have access to the whole repository, and sometimes even more, depending on how much the user allows them to see. Thanks to this, an agent can adjust its style to the rules used in the project, change several files at once, and even run tools that check whether its own solution works, which gives us more confidence that the generated code works correctly. Agents can also commit changes and open pull requests by themselves. Studies \cite{barke2023grounded,peng2023impact}, which looked at the productivity of developers using AI tools, showed the possible benefits of this approach.
+
+However, the role of the developer is still important - now, instead of writing code, the developer's task is to guide the agent's work, give it the right context, and react to its feedback. These actions can differ depending on the developer's experience. Less experienced developers may use agents to get familiar with the code and to speed up its creation - the first tasks in a new environment naturally take a lot of time. More experienced developers, on the other hand, already know the expected style and the goal of a given function, so with an agent they can try several approaches and pick the most effective one. Highly active developers may instead use agents for more complex, exploratory tasks - which can lead to more discussion during code review and a lower acceptance rate, because such code was only meant to check whether a given goal is reachable. This is why we cannot expect a simple, monotonic relationship between agent use and developer experience.
+
+Measuring developer experience by itself seems very hard and often subjective. GitHub does not keep such a classification - it only provides certain metrics, which we can use to build some kind of grouping. In this study we treat experience as a multidimensional activity profile, rather than a directly observed job title or career stage.
+
+The study closest to ours used the AIDev dataset to compare 22\,953 pull requests involving agents, created by 1719 developers split into two groups based on the commit rate over the account's lifetime. This work showed that the lower-experience group had a lower acceptance rate, and the number of comments was significantly higher for this group compared to the other group \cite{asdaque2026novice}. However, this study left two open questions - it is not known whether this pattern holds with more groups, and the study itself did not look at how intensively individual developers use agents.
+
+To answer these questions, we used the AIDev dataset published for the MSR 2026 Mining Challenge \cite{li2026aidev}. The version we used contained 932\,791 pull requests authored by agents, referred to as \emph{Agentic-PRs}, created by five agents: OpenAI Codex, Devin, GitHub Copilot, Cursor, and Claude Code. The November 2025 version covers pull requests created in 116\,211 public GitHub repositories by 72\,189 developers. We additionally enriched this data using the GitHub GraphQL API with the following statistics: account age, public commits, breadth of collaboration, code-review activity, and community recognition. We then used unsupervised clustering to identify three relative activity profiles. For convenience, we refer to them using labels common in the industry: Junior, Mid, and Senior. These labels describe patterns in the analyzed GitHub data and should not be interpreted as verified job titles or actual programming skills.
+
+This study answers the following research questions:
+
+\begin{description}
+    \item[\textbf{RQ1:}] How does the intensity of using AI agents differ between groups, where usage intensity is measured as the number of Agentic-PRs per developer?
+
+    \item[\textbf{RQ2:}] How does the acceptance rate of Agentic-PRs differ between groups?
+
+    \item[\textbf{RQ3:}] How does the acceptance rate of Agentic-PRs compare to pull requests written only by developers, without AI help, from a comparably popular subset of repositories?
+\end{description}
+
+It is worth noting that RQ3 differs in scope from RQ1 and RQ2: it does not compare the groups with each other, but instead compares the whole population of users who contributed Agentic-PRs with an independent, non-agent baseline population, since the two populations of authors overlap only marginally (Section 3).
+
+After preprocessing, the analysis covers 71\,467 developers. Their activity profiles are determined using $k$-means clustering on the full set of standardized indicators. Non-parametric statistical tests were used to assess the significance of differences between groups. The results do not show a simple, increasing relationship with the level of activity - on the contrary, agent-use intensity turned out to be highest for the middle group: Mid. The acceptance rate is highest for Mid and lowest for Senior, while Agentic-PRs are accepted slightly more often than the baseline human population.
+
+This work makes three contributions: (1) it enriches AIDev with multidimensional GitHub activity data at the developer level; (2) it compares agent-use intensity and pull-request acceptance across activity profiles and contrasts it with a baseline human population; (3) it shows that these relationships are non-monotonic, unlike what is found under a narrower, binary split of experience.
+
+The rest of the paper presents an overview of related work (Section 2), describes the dataset and the analysis procedure (Section 3), presents the results for the three research questions (Section 4), and discusses threats to the validity of the study (Section 5), ending with conclusions on the implications for research and practice (Section 6).
