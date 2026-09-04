@@ -13,20 +13,20 @@ Wszystkie trzy porównania parami testem Manna-Whitneya (dwustronne, poprawka Bo
 
 \textbf{Wynik nie jest monotoniczny względem poziomu aktywności.}
 
-Profil \emph{Mid} zdecydowanie najczęściej korzystał z Agentic-PR (średnia 42,1, mediana 12), znacznie powyżej pozostałych grup - \emph{Junior} (średnia 3,6 i mediana 1) oraz \emph{Senior} (7,9 i mediana 2). Senior z kolei ma umiarkowanie, ale istotnie statystycznie wyższą liczbę Agentic-PR niż Junior. Przypomnijmy, że profile są uszeregowane według złożonego wyniku wszystkich 12 wskaźników, a nie samej liczby Agentic-PR (Sekcja 3): Senior wyprzedza Mid w tym złożonym wyniku dzięki wskaźnikom takim jak liczba obserwujących, staż konta oraz gwiazdki i forki repozytoriów, mimo że Mid zgłasza znacznie więcej Agentic-PR. Dwie z trzech wielkości efektu w porównaniach parami są duże (Senior vs Mid $r = 0{,}70$, Mid vs Junior $r = -0{,}82$), spójne z dużym efektem ogólnym; jedynie kontrast Senior vs Junior jest umiarkowany ($r = -0{,}18$).
+Profil Mid zdecydowanie najczęściej korzystał z Agentic-PR (średnia 42,1, mediana 12), znacznie powyżej pozostałych grup - Junior (średnia 3,6 i mediana 1) oraz Senior (7,9 i mediana 2). Senior z kolei ma umiarkowanie, ale istotnie statystycznie wyższą liczbę Agentic-PR niż Junior. Przypomnijmy, że profile są uszeregowane według złożonego wyniku wszystkich 12 wskaźników, a nie samej liczby Agentic-PR (Sekcja 3): Senior wyprzedza Mid w tym złożonym wyniku dzięki wskaźnikom takim jak liczba obserwujących, staż konta oraz gwiazdki i forki repozytoriów, mimo że Mid zgłasza znacznie więcej Agentic-PR. Dwie z trzech wielkości efektu w porównaniach parami są duże (Senior vs Mid $r = 0{,}70$, Mid vs Junior $r = -0{,}82$), spójne z dużym efektem ogólnym; jedynie kontrast Senior vs Junior jest umiarkowany ($r = -0{,}18$).
 
 \begin{table}[tb]
     \centering
-    \caption{RQ1: Agentic-PR count per developer by activity profile.}
+    \caption{RQ1: liczba Agentic-PR na dewelopera według profilu aktywności.}
     \label{tab:rq1-summary}
     \small
     \begin{tabular}{lrrrr}
         \toprule
-        Profile & $N$ & Mean & SD & Median \\
+        Profil & $N$ & Średnia & Odch.\ std & Mediana \\
         \midrule
-        Junior & 44,854 & 3.57  & 25.81  & 1.0 \\
-        Mid    & 12,705 & 42.12 & 115.85 & 12.0 \\
-        Senior & 13,908 & 7.94  & 86.60  & 2.0 \\
+        Junior & 44\,854 & 3,57  & 25,81  & 1,0 \\
+        Mid    & 12\,705 & 42,12 & 115,85 & 12,0 \\
+        Senior & 13\,908 & 7,94  & 86,60  & 2,0 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -58,16 +58,16 @@ Efekt Senior-Mid jest istotny statystycznie, ale znikomy pod względem wielkośc
 
 \begin{table}[tb]
     \centering
-    \caption{RQ2: Agentic-PR acceptance rate (\%) by activity profile.}
+    \caption{RQ2: wskaźnik akceptacji Agentic-PR (\%) według profilu aktywności.}
     \label{tab:rq2-summary}
     \small
     \begin{tabular}{lrrrr}
         \toprule
-        Profile & $N$ & Mean & SD & Median \\
+        Profil & $N$ & Średnia & Odch.\ std & Mediana \\
         \midrule
-        Junior & 31,522 & 90.20 & 27.04 & 100.0 \\
-        Mid    & 12,341 & 91.76 & 18.03 & 100.0 \\
-        Senior & 11,830 & 83.18 & 32.50 & 100.0 \\
+        Junior & 31\,522 & 90,20 & 27,04 & 100,0 \\
+        Mid    & 12\,341 & 91,76 & 18,03 & 100,0 \\
+        Senior & 11\,830 & 83,18 & 32,50 & 100,0 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -90,15 +90,15 @@ Dwustronny test Manna-Whitneya $U$ wykazał statystycznie istotną różnicę ($
 
 \begin{table}[tb]
     \centering
-    \caption{RQ3: pull-request acceptance rate (\%), Agentic-PRs vs.\ human-authored baseline.}
+    \caption{RQ3: wskaźnik akceptacji pull requestów (\%), Agentic-PR w porównaniu do bazowej populacji ludzkiej.}
     \label{tab:rq3-summary}
     \small
     \begin{tabular}{lrrrr}
         \toprule
-        Group & $N$ & Mean & SD & Median \\
+        Grupa & $N$ & Średnia & Odch.\ std & Mediana \\
         \midrule
-        Agent (Agentic-PRs)       & 56,387 & 88.94 & 26.84 & 100.0 \\
-        Human (\texttt{human\_pull\_request}) & 2,286  & 78.65 & 38.80 & 100.0 \\
+        Agent (Agentic-PR)       & 56\,387 & 88,94 & 26,84 & 100,0 \\
+        Człowiek (\texttt{human\_pull\_request}) & 2\,286  & 78,65 & 38,80 & 100,0 \\
         \bottomrule
     \end{tabular}
 \end{table}
