@@ -11,6 +11,7 @@
 
 \ProvidesClass{einformatica}[2024/11/05]
 \NeedsTeXFormat{LaTeX2e}
+\newcounter{aaa}\newcounter{aab}
 %
 %
 \newif\if@eb
@@ -253,7 +254,7 @@
    \put(17,-2){\textsf{\href{https://www.e-informatyka.pl/}{\textbf{e-Informatica Software Engineering Journal}}}}
    \put(17,-8){\textsf{Volume \href{https://www.e-informatyka.pl/index.php/einformatica/volumes/volume-2026/}{\@volume}, Issue \@issue, pages: \arabic{aaa}--\arabic{aab}}}
    \put(17,-14){\textsf{\ifx\@edoi\undefined\else DOI:\space\href{\ifx\@strona\undefined https://dx.doi.org/\@edoi\else\@strona\fi}{\@edoi}\fi}}
-   \put(0,-19){\textcolor[HTML]{706152}{\rule{\dimeval{\textwidth+14mm}}{1.3mm}}}
+   \put(0,-19){\textcolor[HTML]{706152}{\rule{\dimexpr\textwidth+14mm\relax}{1.3mm}}}
   \end{picture}
  }
  \fancyhead[R]{\setlength{\unitlength}{1mm}
@@ -792,7 +793,6 @@
   pdfkeywords = {\ifx\@ekeywordset\undefined\else\@ekeywordset\fi},
   pdfsubject = {e-Informatica Software Engineering Journal, Volume \@volume, Issue \@issue, \@eIyear}
  }
- \newcounter{aaa}\newcounter{aab}
  \setcounterpageref{aaa}{FirstPage}
  \setcounterpageref{aab}{LastPage}
  \IfFileExists{redakcja}{
