@@ -15,7 +15,7 @@ Wszystkie trzy porównania parami testem Manna-Whitneya (dwustronne, poprawka Bo
 
 Profil Mid zdecydowanie najczęściej korzystał z Agentic-PR (średnia 42,1, mediana 12), znacznie powyżej pozostałych grup - Junior (średnia 3,6 i mediana 1) oraz Senior (7,9 i mediana 2). Senior z kolei ma umiarkowanie, ale istotnie statystycznie wyższą liczbę Agentic-PR niż Junior. Przypomnijmy, że profile są uszeregowane według złożonego wyniku wszystkich 12 wskaźników, a nie samej liczby Agentic-PR (Sekcja 3): Senior wyprzedza Mid w tym złożonym wyniku dzięki wskaźnikom takim jak liczba obserwujących, staż konta oraz gwiazdki i forki repozytoriów, mimo że Mid zgłasza znacznie więcej Agentic-PR. Dwie z trzech wielkości efektu w porównaniach parami są duże (Senior vs Mid $r = 0{,}70$, Mid vs Junior $r = -0{,}82$), spójne z dużym efektem ogólnym; jedynie kontrast Senior vs Junior jest umiarkowany ($r = -0{,}18$).
 
-\begin{table}[tb]
+\begin{table}[H]
     \centering
     \caption{RQ1: liczba Agentic-PR na dewelopera według profilu aktywności.}
     \label{tab:rq1-summary}
@@ -30,12 +30,6 @@ Profil Mid zdecydowanie najczęściej korzystał z Agentic-PR (średnia 42,1, me
         \bottomrule
     \end{tabular}
 \end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\linewidth]{summary.png}
-    \label{fig:summary-exp1}
-\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -56,7 +50,7 @@ Tabela~\ref{tab:rq2-summary} przedstawia proporcję rozstrzygniętych Agentic-PR
 
 Efekt Senior-Mid jest istotny statystycznie, ale znikomy pod względem wielkości ($r = -0{,}02$); bardziej znaczące są kontrasty niższej akceptacji Senior względem obu pozostałych profili. Nie jest to ścisły, monotoniczny spadek raportowany we wcześniejszej wersji tej analizy, opartej na klastrowaniu z wykorzystaniem transformacji kwantylowej (tej niestabilnej metody preprocessingu, którą później zastąpiono log(1+x) - patrz Sekcja 3), ale wniosek jakościowy, pozostaje niezmieniony: wyższa złożoność aktywności na GitHubie nie wiąże się z wyższym wskaźnikiem akceptacji Agentic-PR - profil o najwyższej aktywności ma najniższą akceptację w obu wersjach analizy.
 
-\begin{table}[tb]
+\begin{table}[H]
     \centering
     \caption{RQ2: wskaźnik akceptacji Agentic-PR (\%) według profilu aktywności.}
     \label{tab:rq2-summary}
@@ -77,18 +71,12 @@ Efekt Senior-Mid jest istotny statystycznie, ale znikomy pod względem wielkośc
     \includegraphics[width=1\linewidth]{second_experiment_box_plot.png}
     \label{fig:boxplot-exp2}
 \end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{second_boxplot.png}
-    \label{fig:summary-exp2}
-\end{figure}
-
 \subsection{RQ3: How does the acceptance rate of Agentic-PRs compare to a human-authored baseline?}
 Jak opisano w Sekcji 3, jest to porównanie na poziomie populacji, nie według profili aktywności: pełna populacja Agentic-PR (z RQ2, zsumowana po profilach) w porównaniu do niezależnej bazy \texttt{human\_pull\_request} - więc nie jest ono dotknięte zmianą preprocessingu klastrowania. Tabela~\ref{tab:rq3-summary} przedstawia statystyki opisowe dla obu grup.
 
 Dwustronny test Manna-Whitneya $U$ wykazał statystycznie istotną różnicę ($U = 6{,}795 \times 10^{7}$, $p < 10^{-8}$, korelacja rangowo-biseryjna $r = -0{,}054$, 95\% CI bootstrap $[-0{,}075, -0{,}034]$). Agentic-PR są akceptowane nieco częściej (88,9\%) niż bazowa populacja ludzka (78,6\%), choć wielkość efektu jest niewielka, a bazowa populacja ludzka ma znacznie większy rozrzut (SD 38,8 wobec 26,84). Porównanie to nie jest dopasowane na poziomie dewelopera: obie populacje pokrywają się jedynie w 351 z 2515 autorów bazy ludzkiej, więc różnica odzwierciedla dwie różne populacje kontrybutorów w dwóch różnych (choć obu wysoce aktywnych) częściach GitHub, a nie porównanie wewnątrzosobowe - tego samego dewelopera zarówno z użyciem agenta, jak i bez jego udziału.
 
-\begin{table}[tb]
+\begin{table}[H]
     \centering
     \caption{RQ3: wskaźnik akceptacji pull requestów (\%), Agentic-PR w porównaniu do bazowej populacji ludzkiej.}
     \label{tab:rq3-summary}
@@ -102,12 +90,6 @@ Dwustronny test Manna-Whitneya $U$ wykazał statystycznie istotną różnicę ($
         \bottomrule
     \end{tabular}
 \end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\linewidth]{fourth_experiment_summary_table.png}
-    \label{fig:table-exp3}
-\end{figure}
 
 \begin{figure}[H]
     \centering

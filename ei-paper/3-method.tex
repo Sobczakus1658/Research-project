@@ -10,7 +10,7 @@ Aktywność w AIDev opisuje deweloperów głównie w odniesieniu do wkładu powi
 
 Zbieranie danych GraphQL dało rekordy aktywności dla 70\,434 z 72\,189 deweloperów (97,57\%). Wskaźniki liczbowe pozostałych 1755 deweloperów oszacowano za pomocą modeli regresji lasu losowego \cite{breiman2001random}. Modele oceniono przy podziale 80/20 na zbiór treningowy i testowy, a przewidziane wartości liczbowe zaokrąglano do liczb całkowitych. Ich skuteczność predykcyjna była ograniczona - obserwowane wartości $R^2$ przedstawia Tabela~\ref{tab:r2-values}. Wartości te należy więc traktować jako przybliżone uzupełnienie brakujących profili, a nie wiarygodną rekonstrukcję ich aktywności.
 
-\begin{table}[tb]
+\begin{table}[H]
     \centering
     \caption{Skuteczność predykcyjna ($R^2$) modeli imputacji lasem losowym.}
     \label{tab:r2-values}
@@ -27,7 +27,7 @@ Zbieranie danych GraphQL dało rekordy aktywności dla 70\,434 z 72\,189 dewelop
         \bottomrule
     \end{tabular}
 \end{table}
-\begin{table}[tb]
+\begin{table}[H]
     \centering
     \caption{Wskaźniki użyte do wyznaczenia profili aktywności deweloperów.}
     \label{tab:profile-indicators}
@@ -60,7 +60,7 @@ Transformację kwantylową w kierunku rozkładu normalnego brzegowego wypróbowa
 
 Analizę głównych składowych obliczono na przekształconych wskaźnikach, aby wspomóc interpretację dominujących osi zmienności, a nie jako etap redukcji wymiarowości zasilający algorytm klastrowania \cite{jolliffe2016principal}. Pierwsze dwie główne składowe zachowują jedynie około 50\% wariancji, więc projekcja do 2 wymiarów odrzucałaby mniej więcej połowę informacji. Dlatego klastrowanie przeprowadziliśmy na pełnej, 12-wymiarowej, oczyszczonej reprezentacji; PCA(2) raportujemy osobno, wyłącznie w celu wizualizacji, które wskaźniki napędzają dwie dominujące osie. Jak pokazuje Rysunek~\ref{fig:pca-loadings}, pierwsza składowa ładuje się dodatnio na wskaźnikach aktywności i można ją interpretować jako oś ogólnej aktywności. Druga składowa przeciwstawia aktywność powiązaną z agentami i wielkość wkładu publicznego ogólnej rozpoznawalności oraz aktywności recenzenckiej.
 
-\begin{figure}[tb]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.92\linewidth]{pca_1.png}
     \vspace{0.5em}
@@ -71,7 +71,7 @@ Analizę głównych składowych obliczono na przekształconych wskaźnikach, aby
 
 Pełną, 12-wymiarową, oczyszczoną reprezentację podzieliliśmy za pomocą klastrowania $k$-średnich \cite{lloyd1982least}. Zbadaliśmy również rezultaty dla różnych wartości $k=2,\ldots,10$ przy użyciu average silhouette width \cite{rousseeuw1987silhouettes} oraz gap statistic \cite{tibshirani2001gap}, obliczonych na tej samej 12-wymiarowej reprezentacji. Rysunek~\ref{fig:cluster-diagnostics} pokazuje, że $k=3$ nie jest optimum liczbowym według żadnej z tych statystyk. Mimo to zachowaliśmy $k=3$ jako celowo uproszczony i interpretowalny parametr, dopasowany do porównań pomiędzy profilami o niskiej, pośredniej i wysokiej aktywności. Analiza jest więc warunkowa względem tego wyboru i nie zakłada, że trzy klastry stanowią wewnętrzną strukturę populacji deweloperów.
 
-\begin{figure}[tb]
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.90\linewidth]{silnouette.png}
     \vspace{0.5em}
