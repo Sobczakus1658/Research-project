@@ -110,37 +110,43 @@ Skrypty znajdują się w katalogu `scripts/second_experiment/`.
    `results/second_experiment_boxplot.png`.
 3. Uruchom `plot.py` - generuje `results/second_experiment_summary_table.png`.
 
-### Eksperyment 3 - liczba komentarzy maintainerów a poziom doświadczenia
-Skrypty znajdują się w katalogu `scripts/third_experiment/`.
-1. Uruchom `data_to_third_experiment.sql` — ograniczone do AIDev-pop (tabela `pull_request`), liczy
-   inline comments z `pr_review_comments_v2` i wynik zapisz **z nagłówkiem** jako
-   `data/third_experiment/data_to_third_experiment.csv` (kolumny: real_human_author,
-   pull_request_id, comments_by_human_maintainers).
-2. Uruchom `run.py` - testy statystyczne (Kruskal-Wallis + Mann-Whitney dwustronny, epsilon-squared i
-   rank-biserial jako effect size), zapisuje
-   `data/third_experiment/third_experiment_summary_stats.csv` oraz
-   `results/third_experiment_boxplot.png`, `results/third_experiment_summary_table.png`.
-3. Uruchom `plot.py` (regeneruje tabelę podsumowującą z zapisanego CSV).
-
-### Eksperyment 4 - acceptance rate Agentic-PR vs. baseline ludzki (RQ4)
-Skrypty w `scripts/fourth_experiment/`. To porównanie dwóch niezależnych populacji.
+### Eksperyment 3 - acceptance rate Agentic-PR vs. baseline ludzki (RQ3)
+Skrypty w `scripts/third_experiment/`. To porównanie dwóch niezależnych populacji.
 1. Uruchom `human_pull_request_ratio.sql` i wynik zapisz **bez nagłówka** jako
-   `data/fourth_experiment/human_pull_request_ratio.csv` (te same kolumny co w Eksperymencie 2:
+   `data/third_experiment/human_pull_request_ratio.csv` (te same kolumny co w Eksperymencie 2:
    login, total_mr, accepted_mr, rejected_mr, acceptance_rate).
 2. Uruchom `run.py` — wykorzystuje `data/second_experiment/ratio_merge_requests_all.csv` jako grupę Agent,
    liczy pojedynczy dwustronny test Manna-Whitneya (bez Kruskala-Wallisa, bo tylko 2 grupy) z
-   rank-biserial jako effect size, zapisuje `data/fourth_experiment/fourth_experiment_merged.csv`,
-   `data/fourth_experiment/fourth_experiment_summary_stats.csv` oraz
-   `results/fourth_experiment_boxplot.png`.
-3. Uruchom `plot.py` — generuje `results/fourth_experiment_summary_table.png`.
+   rank-biserial jako effect size, zapisuje `data/third_experiment/third_experiment_merged.csv`,
+   `data/third_experiment/third_experiment_summary_stats.csv` oraz
+   `results/third_experiment_boxplot.png`.
+3. Uruchom `plot.py` — generuje `results/third_experiment_summary_table.png`.
 4. (Opcjonalnie) Uruchom `check_population_overlap.py` — sprawdza, ilu autorów `human_pull_request`
-   pokrywa się z populacją agentową; wymaga `data/fourth_experiment/human_pull_request_authors.csv`
+   pokrywa się z populacją agentową; wymaga `data/third_experiment/human_pull_request_authors.csv`
    (`SELECT DISTINCT user AS login FROM human_pull_request;`).
+
+### Wykluczona analiza - liczba komentarzy maintainerów a poziom doświadczenia
+Ta analiza **nie jest jednym z trzech pytań badawczych** w pracy - została zbadana we wczesnej fazie
+projektu, ale wykluczona po tym, jak nie przeszła kontroli wrażliwości complete-case (kierunek się
+odwrócił, istotność zniknęła - patrz `ei-paper/5-threats.tex`, Internal validity). Skrypty zachowano
+w repo dla przejrzystości i odtwarzalności tego ustalenia.
+
+Skrypty znajdują się w katalogu `scripts/excluded_comment_count_experiment/`.
+1. Uruchom `data_to_excluded_comment_count_experiment.sql` — ograniczone do AIDev-pop (tabela
+   `pull_request`), liczy inline comments z `pr_review_comments_v2` i wynik zapisz **z nagłówkiem** jako
+   `data/excluded_comment_count_experiment/data_to_excluded_comment_count_experiment.csv` (kolumny:
+   real_human_author, pull_request_id, comments_by_human_maintainers).
+2. Uruchom `run.py` - testy statystyczne (Kruskal-Wallis + Mann-Whitney dwustronny, epsilon-squared i
+   rank-biserial jako effect size), zapisuje
+   `data/excluded_comment_count_experiment/excluded_comment_count_experiment_summary_stats.csv` oraz
+   `results/excluded_comment_count_experiment_boxplot.png`,
+   `results/excluded_comment_count_experiment_summary_table.png`.
+3. Uruchom `plot.py` (regeneruje tabelę podsumowującą z zapisanego CSV).
 
 ## Analizy wrażliwości
 Skrypty w `scripts/sensitivity_analysis/`. Działają na plikach już wygenerowanych przez główny
-pipeline (`data/prepare_data/`, `data/{first,second,third,fourth}_experiment/`), bez potrzeby dostępu
-do surowego AIDev.
+pipeline (`data/prepare_data/`, `data/{first,second,third}_experiment/`,
+`data/excluded_comment_count_experiment/`), bez potrzeby dostępu do surowego AIDev.
 
 - **`preprocessing_stability_check.py`** — porównuje stabilność klastrowania dla
   `QuantileTransformer` i dla `log1p`.
@@ -149,10 +155,12 @@ do surowego AIDev.
   z AIDev. Zapisuje `data/sensitivity_analysis/exclude_aidev_indicators_labels.csv`.
 - **`rerun_rq1_rq2_excluding_aidev_indicators.py`** — RQ1/RQ2 pod klastrowaniem bez wskaźników
   agentowych (uruchom po `clustering_sensitivity_checks.py`).
-- **`complete_case_rq_rerun.py`** — RQ1-RQ3 tylko na developerach z realnymi (nie imputowanymi)
-  danymi z GraphQL. Zapisuje `data/sensitivity_analysis/complete_case_labels.csv`.
+- **`complete_case_rq_rerun.py`** — RQ1-RQ2 oraz wykluczona analiza liczby komentarzy, tylko na
+  developerach z realnymi (nie imputowanymi) danymi z GraphQL (RQ3 nie zależy od klastrowania i nie
+  jest tu ponownie liczone). Zapisuje `data/sensitivity_analysis/complete_case_labels.csv`.
 - **`bootstrap_effect_size_cis.py`** — 95% CI (bootstrap, 2000 powtórzeń) dla wszystkich effect sizes
-  cytowanych w `ei-paper/4-results.tex`.
+  cytowanych w `ei-paper/4-results.tex` (RQ1-RQ3), a dodatkowo, wyłącznie jako punkt odniesienia,
+  ten sam rachunek dla wykluczonej analizy liczby komentarzy (nie jest częścią raportowanych RQ).
 
 Wyniki tych skryptów są zacytowane w `ei-paper/5-threats.tex` i `ei-paper/6-conclusions.tex`.
 
@@ -266,36 +274,43 @@ Scripts are located in the `scripts/second_experiment/` directory.
    `results/second_experiment_boxplot.png`.
 3. Run `plot.py` - generates `results/second_experiment_summary_table.png`.
 
-### Experiment 3 - number of maintainer comments vs. experience level
+### Experiment 3 - Agentic-PR acceptance vs. a human-authored baseline (RQ3)
 Scripts are located in the `scripts/third_experiment/` directory.
-1. Run `data_to_third_experiment.sql` — restricted to AIDev-pop (`pull_request` table), counts inline
-   comments from `pr_review_comments_v2` — and save the result **with a header** as
-   `data/third_experiment/data_to_third_experiment.csv` (columns: real_human_author,
-   pull_request_id, comments_by_human_maintainers).
-2. Run `run.py` - statistical tests (Kruskal–Wallis + two-sided Mann–Whitney, epsilon-squared and
-   rank-biserial as effect size), saves
-   `data/third_experiment/third_experiment_summary_stats.csv` as well as
-   `results/third_experiment_boxplot.png`, `results/third_experiment_summary_table.png`.
-3. Run `plot.py` (regenerates the summary table from the saved CSV).
-
-### Experiment 4 - Agentic-PR acceptance vs. a human-authored baseline (RQ4)
-Scripts are located in the `scripts/fourth_experiment/` directory.
 1. Run `human_pull_request_ratio.sql` and save the result **without a header** as
-   `data/fourth_experiment/human_pull_request_ratio.csv` (same columns as Experiment 2:
+   `data/third_experiment/human_pull_request_ratio.csv` (same columns as Experiment 2:
    login, total_mr, accepted_mr, rejected_mr, acceptance_rate).
 2. Run `run.py` - reuses `data/second_experiment/ratio_merge_requests_all.csv` as the Agent group, runs a
    single two-sided Mann-Whitney U test (no Kruskal-Wallis needed for 2 groups) with rank-biserial effect
-   size, saves `data/fourth_experiment/fourth_experiment_merged.csv`,
-   `data/fourth_experiment/fourth_experiment_summary_stats.csv`, and
-   `results/fourth_experiment_boxplot.png`.
-3. Run `plot.py` - generates `results/fourth_experiment_summary_table.png`.
+   size, saves `data/third_experiment/third_experiment_merged.csv`,
+   `data/third_experiment/third_experiment_summary_stats.csv`, and
+   `results/third_experiment_boxplot.png`.
+3. Run `plot.py` - generates `results/third_experiment_summary_table.png`.
 4. (Optional) Run `check_population_overlap.py` — checks how many `human_pull_request` authors overlap
-   with the agent-PR population; requires `data/fourth_experiment/human_pull_request_authors.csv`
+   with the agent-PR population; requires `data/third_experiment/human_pull_request_authors.csv`
    (`SELECT DISTINCT user AS login FROM human_pull_request;`).
+
+### Excluded analysis - number of maintainer comments vs. experience level
+This analysis **is not one of the paper's three research questions** - it was explored early in the
+project, but excluded after it failed the complete-case sensitivity check (its direction reversed and
+significance disappeared - see `ei-paper/5-threats.tex`, Internal validity). The scripts are kept in
+the repo for transparency and to make this finding reproducible.
+
+Scripts are located in the `scripts/excluded_comment_count_experiment/` directory.
+1. Run `data_to_excluded_comment_count_experiment.sql` — restricted to AIDev-pop (`pull_request`
+   table), counts inline comments from `pr_review_comments_v2` — and save the result **with a header**
+   as `data/excluded_comment_count_experiment/data_to_excluded_comment_count_experiment.csv` (columns:
+   real_human_author, pull_request_id, comments_by_human_maintainers).
+2. Run `run.py` - statistical tests (Kruskal–Wallis + two-sided Mann–Whitney, epsilon-squared and
+   rank-biserial as effect size), saves
+   `data/excluded_comment_count_experiment/excluded_comment_count_experiment_summary_stats.csv` as well
+   as `results/excluded_comment_count_experiment_boxplot.png`,
+   `results/excluded_comment_count_experiment_summary_table.png`.
+3. Run `plot.py` (regenerates the summary table from the saved CSV).
 
 ## Sensitivity analyses
 Scripts in `scripts/sensitivity_analysis/`. They run on files the main pipeline already produces
-(`data/prepare_data/`, `data/{first,second,third,fourth}_experiment/`), without needing raw AIDev access.
+(`data/prepare_data/`, `data/{first,second,third}_experiment/`,
+`data/excluded_comment_count_experiment/`), without needing raw AIDev access.
 
 - **`preprocessing_stability_check.py`** — compares clustering stability for `QuantileTransformer` and
   for `log1p`.
@@ -304,9 +319,11 @@ Scripts in `scripts/sensitivity_analysis/`. They run on files the main pipeline 
   AIDev-derived indicators. Saves `data/sensitivity_analysis/exclude_aidev_indicators_labels.csv`.
 - **`rerun_rq1_rq2_excluding_aidev_indicators.py`** — RQ1/RQ2 under the clustering without
   agent-usage indicators (run `clustering_sensitivity_checks.py` first).
-- **`complete_case_rq_rerun.py`** — RQ1-RQ3 restricted to developers with real (non-imputed) GraphQL
-  data. Saves `data/sensitivity_analysis/complete_case_labels.csv`.
+- **`complete_case_rq_rerun.py`** — RQ1-RQ2 and the excluded comment-count analysis, restricted to
+  developers with real (non-imputed) GraphQL data (RQ3 does not depend on clustering and is not
+  rerun here). Saves `data/sensitivity_analysis/complete_case_labels.csv`.
 - **`bootstrap_effect_size_cis.py`** — 95% bootstrap CIs (2,000 resamples) for every effect size
-  quoted in `ei-paper/4-results.tex`.
+  quoted in `ei-paper/4-results.tex` (RQ1-RQ3), plus, for reference only, the same statistics for the
+  excluded comment-count analysis (not part of the reported RQs).
 
 These scripts' results are cited in `ei-paper/5-threats.tex` and `ei-paper/6-conclusions.tex`.

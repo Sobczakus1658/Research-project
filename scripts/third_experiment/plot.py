@@ -1,21 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-summary_stats = pd.read_csv('../../data/third_experiment/third_experiment_summary_stats.csv')
+df = pd.read_csv('../../data/third_experiment/third_experiment_summary_stats.csv')
 
-summary_stats['Level'] = ['Junior', 'Mid', 'Senior']
+stats_formatted = df.copy()
+stats_formatted['User_Count'] = stats_formatted['User_Count'].apply(lambda x: f"{int(x):,}")
+for col in ['Mean', 'Std_Dev', 'Median', 'IQR', 'Min', 'Max']:
+    stats_formatted[col] = stats_formatted[col].map('{:.2f}'.format)
 
-stats_formatted = summary_stats[['Level', 'N', 'Mean', 'SD', 'Mdn']].copy()
-
-stats_formatted['N'] = stats_formatted['N'].apply(lambda x: f"{int(x):,}")
-stats_formatted['Mean'] = stats_formatted['Mean'].map('{:.5f}'.format)
-stats_formatted['SD'] = stats_formatted['SD'].map('{:.5f}'.format)
-stats_formatted['Mdn'] = stats_formatted['Mdn'].map('{:.1f}'.format)
-
-fig, ax_table = plt.subplots(figsize=(5, 3))
+fig, ax_table = plt.subplots(figsize=(8, 2.5))
 ax_table.axis('off')
-
-plt.title("Summary statistics", fontsize=12, fontweight='bold', pad=10)
+plt.title("RQ3 summary statistics: Agent vs Human PR acceptance rate (%)", fontsize=11, fontweight='bold', pad=10)
 
 table = ax_table.table(
     cellText=stats_formatted.values,
@@ -23,10 +18,9 @@ table = ax_table.table(
     cellLoc='center',
     loc='center'
 )
-
 table.auto_set_font_size(False)
-table.set_fontsize(10)
-table.scale(1.2, 1.8)
+table.set_fontsize(9)
+table.scale(1.1, 1.8)
 
 for (row, col), cell in table.get_celld().items():
     if row == 0:
@@ -38,5 +32,4 @@ plt.tight_layout()
 table_path = '../../results/third_experiment_summary_table.png'
 plt.savefig(table_path, dpi=300, bbox_inches='tight')
 plt.close()
-
-print(f"Summary table successfully saved to: {table_path}")
+print(f"Summary table saved to: {table_path}")

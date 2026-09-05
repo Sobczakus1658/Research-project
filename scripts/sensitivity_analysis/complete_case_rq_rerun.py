@@ -1,14 +1,15 @@
 """
-Reruns RQ1-RQ3 restricted to the 70,434 complete-case developers (excluding
-the 1,755 developers whose GraphQL indicators were random-forest-imputed),
-under the log1p clustering pipeline actually used in k_means.py. RQ4 is
+Reruns RQ1-RQ2, plus the excluded comment-count candidate metric, restricted
+to the 70,434 complete-case developers (excluding the 1,755 developers whose
+GraphQL indicators were random-forest-imputed), under the log1p clustering
+pipeline actually used in k_means.py. RQ3 (Agentic-PR vs. human baseline) is
 unaffected by clustering/imputation choices by construction and is not
 rerun here.
 
-Reported in ei-paper/5-threats.tex (Internal validity) and
-ei-paper/4-results.tex (RQ3 paragraph): RQ1 and RQ2 are essentially
-unchanged; RQ3 does not replicate (its direction reverses and loses
-significance).
+Reported in ei-paper/5-threats.tex (Internal validity): RQ1 and RQ2 are
+essentially unchanged; the excluded comment-count metric does not replicate
+(its direction reverses and loses significance) -- this is why it was
+excluded from the final research questions.
 """
 import pandas as pd
 import numpy as np
@@ -85,9 +86,9 @@ def main():
     ratio['acceptance_rate'] = pd.to_numeric(ratio['acceptance_rate'], errors='coerce')
     report("RQ2", pd.merge(cc_labels, ratio, on='login'), 'acceptance_rate')
 
-    rq3 = pd.read_csv('../../data/third_experiment/data_to_third_experiment.csv')
-    m3 = pd.merge(rq3, cc_labels, left_on='real_human_author', right_on='login', how='inner')
-    report("RQ3", m3, 'comments_by_human_maintainers')
+    excluded_metric = pd.read_csv('../../data/excluded_comment_count_experiment/data_to_excluded_comment_count_experiment.csv')
+    m3 = pd.merge(excluded_metric, cc_labels, left_on='real_human_author', right_on='login', how='inner')
+    report("Excluded comment-count metric", m3, 'comments_by_human_maintainers')
 
 
 if __name__ == '__main__':

@@ -1,8 +1,10 @@
 """
 Computes 95% bootstrap confidence intervals for every effect size reported
 in ei-paper/4-results.tex: epsilon-squared (Kruskal-Wallis) and
-rank-biserial correlation (pairwise Mann-Whitney U) for RQ1-RQ3, and
-rank-biserial correlation for RQ4.
+rank-biserial correlation (pairwise Mann-Whitney U) for RQ1-RQ2, and
+rank-biserial correlation for RQ3 (Agentic-PR vs. human baseline). Also
+reports the same statistics for the excluded comment-count candidate
+metric, for reference only -- it is not part of the three reported RQs.
 
 Method (documented in ei-paper/3-method.tex, Statistical analysis
 subsection): resample each group independently with replacement, recompute
@@ -72,17 +74,17 @@ def main():
     g2 = {g: m2[m2.experience == g]['acceptance_rate'].dropna().values for g in ORDER}
     run_rq("RQ2", g2, ORDER, [('Senior', 'Junior'), ('Senior', 'Mid'), ('Mid', 'Junior')])
 
-    rq3 = pd.read_csv('../../data/third_experiment/data_to_third_experiment.csv')
-    m3 = pd.merge(rq3, levels, left_on='real_human_author', right_on='login', how='inner')
+    excluded_metric = pd.read_csv('../../data/excluded_comment_count_experiment/data_to_excluded_comment_count_experiment.csv')
+    m3 = pd.merge(excluded_metric, levels, left_on='real_human_author', right_on='login', how='inner')
     g3 = {g: m3[m3.experience == g]['comments_by_human_maintainers'].values for g in ORDER}
-    run_rq("RQ3", g3, ORDER, [('Junior', 'Mid'), ('Junior', 'Senior'), ('Mid', 'Senior')])
+    run_rq("Excluded comment-count metric (not an RQ)", g3, ORDER, [('Junior', 'Mid'), ('Junior', 'Senior'), ('Mid', 'Senior')])
 
     human = pd.read_csv(
-        '../../data/fourth_experiment/human_pull_request_ratio.csv',
+        '../../data/third_experiment/human_pull_request_ratio.csv',
         header=None, names=['login', 'total_mr', 'accepted_mr', 'rejected_mr', 'acceptance_rate'],
     )
     human['acceptance_rate'] = pd.to_numeric(human['acceptance_rate'], errors='coerce')
-    print("\n========== RQ4 ==========")
+    print("\n========== RQ3 ==========")
     r, lo, hi = boot_rb(ratio['acceptance_rate'].dropna().values, human['acceptance_rate'].dropna().values)
     print(f"Agent vs Human: rank-biserial r = {r:.4f}  95% CI [{lo:.4f}, {hi:.4f}]")
 
